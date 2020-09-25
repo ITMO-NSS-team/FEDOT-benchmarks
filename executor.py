@@ -8,7 +8,7 @@ from model.H2O.b_h2o import run_h2o
 from model.autokeras.b_autokeras import run_autokeras
 from baseline.b_xgboost import run_xgboost
 from benchmark_model_types import BenchmarkModelTypesEnum
-from fedot.b_fedot import run_fedot
+from model.fedot.b_fedot import run_fedot
 from model.tpot.b_tpot import run_tpot
 from core.repository.tasks import TaskTypesEnum
 
