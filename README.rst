@@ -6,5 +6,31 @@ problem data you want. The repository already has some cases
 (i.e. credit_scoring), the ability to work with PMLB datasets and open
 to new experiments.
 
-Currently, ``core`` directory implements the functionality of the FEDOT
-Framework.
+Installation
+------------
+AutoML benchmark includes
+`FEDOT framework <https://github.com/nccr-itmo/FEDOT>`__.
+
+To work with the FEDOT submodule without extra efforts and mistakes
+follow the steps:
+1. To clone module with the content of submodule
+
+   ::
+
+   $ git clone –-recursive https://github.com/ITMO-NSS-team/AutoML-benchmark
+
+2. From the project directory create a soft link to the core of
+the FEDOT Framework typing following command in terminal:
+
+  ::
+
+   $ ln -s FEDOT/core core
+
+**Please, do not add your link directory to the commits**. If you don’t want
+to use the link anymore type the following command from the project
+directory:
+
+   ::
+
+   $ unlink core
+
