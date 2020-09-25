@@ -9,10 +9,11 @@ to new experiments.
 Installation
 ------------
 AutoML benchmark includes
-`FEDOT framework <https://github.com/nccr-itmo/FEDOT>`__.
+`FEDOT framework <https://github.com/nccr-itmo/FEDOT>`__ as a submodule.
 
 To work with the FEDOT submodule without extra efforts and mistakes
 follow the steps:
+
 1. To clone module with the content of submodule
 
    ::
