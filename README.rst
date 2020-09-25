@@ -20,18 +20,20 @@ follow the steps:
 
    $ git clone –-recursive https://github.com/ITMO-NSS-team/AutoML-benchmark
 
-2. From the project directory create a soft link to the core of
-the FEDOT Framework typing following command in terminal:
 
-  ::
+2. From the project directory create a soft link to the core of
+   the FEDOT Framework typing following command in terminal:
+
+   ::
 
    $ ln -s FEDOT/core core
+
 
 **Please, do not add your link directory to the commits**. If you don’t want
 to use the link anymore type the following command from the project
 directory:
 
-   ::
+::
 
-   $ unlink core
+$ unlink core
 
