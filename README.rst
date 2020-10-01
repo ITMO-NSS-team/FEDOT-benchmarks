@@ -55,3 +55,50 @@ Windows (run terminal as administrator)
 
 $ rmdir core
 
+
+How to
+------
+
+To build an experiment create a directory with the name of your case in
+test_cases directory. Create a directory named ``data`` to put your data
+files here and a script named as your case and fill it in as follows:
+
+.. code:: python
+
+   from benchmark_model_types import BenchmarkModelTypesEnum
+   from executor import CaseExecutor, ExecutionParams
+   from core.repository.tasks import TaskTypesEnum
+   from benchmark_utils import (get_models_hyperparameters,
+                                save_metrics_result_file,
+                                get_your_case_data_paths,
+                                )
+
+   if __name__ == '__main__':
+       train_file, test_file = get_your_case_data_paths()
+
+       result_metrics = CaseExecutor(params=ExecutionParams(train_file=train_file,
+                                                            test_file=test_file,
+                                                            task=TaskTypesEnum.classification,
+                                                            target_name='default',
+                                                            case_label='your_case'),
+                                     models=[BenchmarkModelTypesEnum.baseline,
+                                             BenchmarkModelTypesEnum.tpot,
+                                             BenchmarkModelTypesEnum.fedot],
+                                     metric_list=['roc_auc', 'f1']).execute()
+
+        result_metrics['hyperparameters'] = get_models_hyperparameters()
+
+        save_metrics_result_file(result_metrics, file_name='scoring_metrics')
+
+To import your data properly make a corresponding function for your case
+in benchmark_utils script:
+
+.. code:: python
+
+   def get_your_case_data_paths() -> Tuple[str, str]:
+       train_file_path = os.path.join('test_cases', 'your_directory', 'data', 'your_case_name_train.csv')
+       test_file_path = os.path.join('test_cases', 'your_directory', 'data', 'your_case_name_test.csv')
+       full_train_file_path = os.path.join(str(project_root()), train_file_path)
+       full_test_file_path = os.path.join(str(project_root()), test_file_path)
+
+       return full_train_file_path, full_test_file_path
