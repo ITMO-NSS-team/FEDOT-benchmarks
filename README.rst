@@ -80,6 +80,7 @@ metrics to run.
                                          BenchmarkModelTypesEnum.fedot],
                                  metric_list=['roc_auc', 'f1']).execute()
 
+
 To understand which hyperparameters were used for AutoML models have a
 look at the realisation of the get_models_hyperparameters function to
 see or tailor the requirement parameters.
@@ -102,9 +103,8 @@ To build an experiment create a directory with the name of your case in
 test_cases directory. Create a directory named ``data`` inside to put your data
 files here and a script named as your case and fill it in as follows:
 
-.. note::
-   Do not forget to replace all the ``your_case`` phrases in names to the name of
-   your case
+Note! Do not forget to replace all the ``your_case`` phrases in names to the name of
+your case
 
 .. code:: python
 
