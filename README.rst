@@ -70,6 +70,7 @@ The main part presents the CaseExecutor with the params, models and
 metrics to run.
 
 .. code:: python
+
    result_metrics = CaseExecutor(params=ExecutionParams(train_file=train_file,
                                                         test_file=test_file,
                                                         task=TaskTypesEnum.classification,
