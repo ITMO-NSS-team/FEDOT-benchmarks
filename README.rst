@@ -59,9 +59,52 @@ $ rmdir core
 How to
 ------
 
+Execute existing cases
+~~~~~~~~~~~~~~~~~~~~~~
+
+All the existing cases are located in test_cases directory. To execute
+an experiment open the directory with the case and run the script
+case_name.py inside.
+
+The main part presents the CaseExecutor with the params, models and
+metrics to run.
+
+.. code:: python
+   result_metrics = CaseExecutor(params=ExecutionParams(train_file=train_file,
+                                                        test_file=test_file,
+                                                        task=TaskTypesEnum.classification,
+                                                        target_name='default',
+                                                        case_label='scoring'),
+                                 models=[BenchmarkModelTypesEnum.baseline,
+                                         BenchmarkModelTypesEnum.tpot,
+                                         BenchmarkModelTypesEnum.fedot],
+                                 metric_list=['roc_auc', 'f1']).execute()
+
+To understand which hyperparameters were used for AutoML models have a
+look at the realisation of the get_models_hyperparameters function to
+see or tailor the requirement parameters.
+
+.. code:: python
+
+   result_metrics['hyperparameters'] = get_models_hyperparameters()
+
+The following function saves the result of the execution to json file
+next to the case script.
+
+.. code:: python
+
+   save_metrics_result_file(result_metrics, file_name='scoring_metrics')
+
+Add custom experiment
+~~~~~~~~~~~~~~~~~~~~~
+
 To build an experiment create a directory with the name of your case in
-test_cases directory. Create a directory named ``data`` to put your data
+test_cases directory. Create a directory named ``data`` inside to put your data
 files here and a script named as your case and fill it in as follows:
+
+.. note::
+   Do not forget to replace all the ``your_case`` phrases in names to the name of
+   your case
 
 .. code:: python
 
@@ -88,7 +131,7 @@ files here and a script named as your case and fill it in as follows:
 
         result_metrics['hyperparameters'] = get_models_hyperparameters()
 
-        save_metrics_result_file(result_metrics, file_name='scoring_metrics')
+        save_metrics_result_file(result_metrics, file_name='your_case_metrics')
 
 To import your data properly make a corresponding function for your case
 in benchmark_utils script:
@@ -102,3 +145,8 @@ in benchmark_utils script:
        full_test_file_path = os.path.join(str(project_root()), test_file_path)
 
        return full_train_file_path, full_test_file_path
+
+
+Pay attention to the task and model types and target_name(the target
+column name). All the supported task types and model types are available in the
+TaskTypesEnum and BenchmarkModelTypesEnum objects respectively.
