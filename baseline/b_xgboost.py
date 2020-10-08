@@ -1,7 +1,7 @@
 import xgboost as xgb
 
-from core.models.data import InputData
-from core.repository.tasks import TaskTypesEnum
+from FEDOT.core.models.data import InputData
+from FEDOT.core.repository.tasks import TaskTypesEnum
 
 
 def run_xgboost(params: 'ExecutionParams'):
@@ -12,7 +12,7 @@ def run_xgboost(params: 'ExecutionParams'):
     train_data = InputData.from_csv(train_file_path)
     test_data = InputData.from_csv(test_file_path)
 
-    if task is TaskTypesEnum.classification:
+    if task == TaskTypesEnum.classification:
         model = xgb.XGBClassifier(max_depth=2, learning_rate=1.0, objective='binary:logistic')
         model.fit(train_data.features, train_data.target)
         predicted = model.predict_proba(test_data.features)[:, 1]
