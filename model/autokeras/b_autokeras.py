@@ -19,7 +19,7 @@ def run_autokeras(params: 'ExecutionParams'):
 
     # TODO Save model to file
 
-    if task is TaskTypesEnum.classification:
+    if task == TaskTypesEnum.classification:
         estimator = ak.StructuredDataClassifier
     else:
         estimator = ak.StructuredDataRegressor
