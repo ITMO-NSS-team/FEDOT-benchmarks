@@ -55,6 +55,11 @@ Windows (run terminal as administrator)
 
 $ rmdir core
 
+Update the FEDOT submodule with:
+
+::
+
+$ git submodule update --remote FEDOT
 
 How to
 ------
