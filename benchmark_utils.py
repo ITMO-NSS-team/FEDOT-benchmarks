@@ -6,9 +6,15 @@ from typing import Tuple
 
 import pandas as pd
 from pmlb import fetch_data
+from pathlib import Path
 
-from core.utils import ensure_directory_exists, get_split_data_paths, project_root, save_file_to_csv, \
-    split_data
+from FEDOT.core.utils import ensure_directory_exists, get_split_data_paths, \
+    save_file_to_csv, split_data
+
+
+def project_root() -> Path:
+    """Returns project root folder."""
+    return Path(__file__).parent
 
 
 def get_scoring_case_data_paths() -> Tuple[str, str]:

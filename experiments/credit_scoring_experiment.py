@@ -5,18 +5,18 @@ from typing import Optional
 import numpy as np
 from sklearn.metrics import roc_auc_score as roc_auc
 
-from core.composer.chain import Chain
-from core.composer.gp_composer.gp_composer import GPComposer, GPComposerRequirements
-from core.composer.optimisers.crossover import CrossoverTypesEnum
-from core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
-from core.composer.optimisers.mutation import MutationTypesEnum
-from core.composer.optimisers.regularization import RegularizationTypesEnum
-from core.composer.optimisers.selection import SelectionTypesEnum
-from core.models.data import InputData
-from core.repository.model_types_repository import ModelTypesRepository
-from core.repository.quality_metrics_repository import \
+from FEDOT.core.composer.chain import Chain
+from FEDOT.core.composer.gp_composer.gp_composer import GPComposer, GPComposerRequirements
+from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
+from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
+from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
+from FEDOT.core.composer.optimisers.regularization import RegularizationTypesEnum
+from FEDOT.core.composer.optimisers.selection import SelectionTypesEnum
+from FEDOT.core.models.data import InputData
+from FEDOT.core.repository.model_types_repository import ModelTypesRepository
+from FEDOT.core.repository.quality_metrics_repository import \
     (ClassificationMetricsEnum, MetricsRepository)
-from core.repository.tasks import TaskTypesEnum
+from FEDOT.core.repository.tasks import TaskTypesEnum
 
 random.seed(1)
 np.random.seed(1)
