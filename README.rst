@@ -55,7 +55,7 @@ Windows (run terminal as administrator)
 
 $ rmdir core
 
-Update the FEDOT submodule with:
+Update the FEDOT submodule typing the following command:
 
 ::
 
