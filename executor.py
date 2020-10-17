@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-import numpy as np
 from sklearn.metrics import f1_score, mean_squared_error, r2_score, roc_auc_score, balanced_accuracy_score
 
 from model.H2O.b_h2o import run_h2o

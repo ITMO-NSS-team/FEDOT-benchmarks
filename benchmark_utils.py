@@ -1,13 +1,14 @@
 import gc
 import json
 import os
-from glob import glob
-from pathlib import Path
 from typing import Tuple
 
 import pandas as pd
-from fedot.core.utils import save_file_to_csv, split_data
 from pmlb import fetch_data
+from pathlib import Path
+
+from fedot.core.utils import ensure_directory_exists, get_split_data_paths, \
+    save_file_to_csv, split_data
 
 
 def project_root() -> Path:
