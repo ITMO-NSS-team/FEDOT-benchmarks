@@ -1,3 +1,4 @@
 [submodule "FEDOT"]
 	path = FEDOT
 	url = https://github.com/nccr-itmo/FEDOT
+	branch = parameter-free-evo-approach

@@ -34,7 +34,7 @@ def calculate_validation_metric(chain: Chain, dataset_to_validate: InputData) ->
 def run_credit_scoring_problem(train_file_path, test_file_path,
                                max_lead_time: datetime.timedelta = datetime.timedelta(minutes=5),
                                gp_optimiser_params: Optional[GPChainOptimiserParameters] = None, pop_size=None,
-                               generations=None):
+                               generations=None, max_depth=3):
     dataset_to_compose = InputData.from_csv(train_file_path)
     dataset_to_validate = InputData.from_csv(test_file_path)
 
@@ -55,11 +55,12 @@ def run_credit_scoring_problem(train_file_path, test_file_path,
                                                           crossover_types=crossover_types,
                                                           mutation_types=mutation_types,
                                                           regularization_type=regularization_type)
+
     composer_requirements = GPComposerRequirements(
         primary=available_model_types,
         secondary=available_model_types, max_arity=4,
-        max_depth=3, pop_size=pop_size, num_of_generations=generations,
-        crossover_prob=0.8, mutation_prob=0.8, max_lead_time=max_lead_time)
+        max_depth=max_depth, pop_size=pop_size, num_of_generations=generations,
+        crossover_prob=0.8, mutation_prob=0.8, max_lead_time=max_lead_time, add_single_model_chains=False)
 
     # Create GP-based composer
     composer = GPComposer()
