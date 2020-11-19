@@ -8,6 +8,7 @@ import numpy as np
 from typing import List
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.viz import show_history_optimization_comparison
+
 from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
 from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
 from FEDOT.core.composer.optimisers.inheritance import GeneticSchemeTypesEnum
@@ -33,24 +34,26 @@ def add_result_to_csv(f, t_opt, regular, auc, n_models, n_layers):
         writer.writerow([t_opt, regular, auc, n_models, n_layers])
 
 
-def _reduced_history_best(history, generations: int, pop_size: int, pop_sizes: List[List[int]] = None):
+def _reduced_history_best(history: List[List[float]]):
     reduced = []
-    for gen in range(generations):
-        if pop_sizes is not None:
-            pop_size = pop_sizes[gen]
-            if gen == 0:
-                num_from = 0
-            else:
-                num_from = sum(pop_sizes[:gen])
-
-            fitness_values = [abs(individ) for individ in history[num_from: num_from + pop_size]]
-        else:
-            fitness_values = [abs(individ) for individ in history[gen * pop_size: (gen + 1) * pop_size]]
-        best = max(fitness_values)
-        print(f'Max in generation #{gen}: {best}')
+    for i, fitness_values in enumerate(history):
+        best = abs(min(fitness_values))
+        print(f'Max in generation #{i}: {best}')
         reduced.append(best)
 
     return reduced
+
+
+def results_preprocess_and_visualisation(history_gp, labels, iterations):
+    reduced_fitness_gp = [[] for _ in range(len(history_gp))]
+    for launch_num in range(len(history_gp)):
+        for history in history_gp[launch_num]:
+            fitness = _reduced_history_best(history)
+            reduced_fitness_gp[launch_num].append(fitness)
+    np.save('reduced_fitness_gp', reduced_fitness_gp)
+    show_history_optimization_comparison(optimisers_fitness_history=reduced_fitness_gp,
+                                         iterations=[_ for _ in range(iterations)],
+                                         labels=labels)
 
 
 if __name__ == '__main__':
@@ -73,11 +76,8 @@ if __name__ == '__main__':
     pop_size = 20
     iterations = 20
     runs = 4
-    parameter_free_launches = []
     while time_amount <= max_amount_of_time:
         for type_num, scheme_type in enumerate(genetic_schemes_set):
-            if scheme_type == GeneticSchemeTypesEnum.parameter_free:
-                parameter_free_launches.append(type_num)
             for run in range(runs):
                 gc.collect()
                 selection_types = [SelectionTypesEnum.tournament]
@@ -105,24 +105,11 @@ if __name__ == '__main__':
                 is_regular = regular_type == RegularizationTypesEnum.decremental
                 add_result_to_csv(file_path_result, time_amount, is_regular, round(roc_auc, 4), len(chain.nodes),
                                   chain.depth)
-                historical_fitness = [chain.fitness for chain in composer.history]
+
+                historical_fitness = [[chain.fitness for chain in pop] for pop in composer.history]
                 history_gp[type_num].append(historical_fitness)
-                if genetic_scheme_type == GeneticSchemeTypesEnum.parameter_free:
-                    param_free_pop_sizes.append(composer.pop_sizes)
+                print(history_gp)
         time_amount += step
-    reduced_fitness_gp = [[] for _ in range(len(history_gp))]
-    for launch_num in range(len(history_gp)):
-        for history in history_gp[launch_num]:
-            if launch_num in parameter_free_launches:
-                fitness = _reduced_history_best(history, iterations, pop_size, param_free_pop_sizes[0])
-                param_free_pop_sizes = param_free_pop_sizes[1:]
-            else:
-                fitness = _reduced_history_best(history, iterations, pop_size)
-            reduced_fitness_gp[launch_num].append(fitness)
-    np.save('reduced_fitness_gp', reduced_fitness_gp)
-    print(reduced_fitness_gp)
-    m = [_ * pop_size for _ in range(iterations)]
-    show_history_optimization_comparison(optimisers_fitness_history=reduced_fitness_gp,
-                                         iterations=[_ for _ in range(iterations)],
-                                         labels=['parameter-free', 'parameter-free with depth config', 'steady-state',
-                                                 'steady-state with depth config'])
+
+    labels = ['parameter-free', 'parameter-free with depth config', 'steady-state', 'steady-state with depth config']
+    results_preprocess_and_visualisation(history_gp=history_gp, labels=labels, iterations=iterations)

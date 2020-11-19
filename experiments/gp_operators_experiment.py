@@ -3,10 +3,9 @@ import datetime
 import gc
 import os
 
-import numpy as np
-
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
-from experiments.viz import show_history_optimization_comparison
+from experiments.gp_schemes_experiment import results_preprocess_and_visualisation
+
 from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
 from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
 from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
@@ -29,16 +28,6 @@ def add_result_to_csv(f, t_opt, regular, auc, n_models, n_layers):
     with open(f, 'a', newline='') as file:
         writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         writer.writerow([t_opt, regular, auc, n_models, n_layers])
-
-
-def _reduced_history_best(history, generations, pop_size):
-    reduced = []
-    for gen in range(generations):
-        fitness_values = [abs(individ) for individ in history[gen * pop_size: (gen + 1) * pop_size]]
-        best = max(fitness_values)
-        reduced.append(best)
-
-    return reduced
 
 
 if __name__ == '__main__':
@@ -81,18 +70,8 @@ if __name__ == '__main__':
                 is_regular = regular_type == RegularizationTypesEnum.decremental
                 add_result_to_csv(file_path_result, time_amount, is_regular, round(roc_auc, 4), len(chain.nodes),
                                   chain.depth)
-                historical_fitness = [chain.fitness for chain in composer.history]
+                historical_fitness = [[chain.fitness for chain in pop] for pop in composer.history]
                 history_gp[type_num].append(historical_fitness)
         time_amount += step
-    reduced_fitness_gp = [[] for _ in range(len(history_gp))]
-    for launch_num in range(len(history_gp)):
-        for history in history_gp[launch_num]:
-            fitness = _reduced_history_best(history, iterations, pop_size)
-            reduced_fitness_gp[launch_num].append(fitness)
-    np.save('reduced_fitness_gp', reduced_fitness_gp)
-    print(reduced_fitness_gp)
-    m = [_ * pop_size for _ in range(iterations)]
-    show_history_optimization_comparison(optimisers_fitness_history=reduced_fitness_gp,
-                                         iterations=[_ for _ in range(iterations)],
-                                         labels=['Subtree crossover', 'One-point crossover', 'All crossover types',
-                                                 'Without crossover'])
+    labels = ['Subtree crossover', 'One-point crossover', 'All crossover types', 'Without crossover']
+    results_preprocess_and_visualisation(history_gp=history_gp, labels=labels, iterations=iterations)
