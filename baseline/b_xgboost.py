@@ -1,7 +1,7 @@
 import xgboost as xgb
 
-from FEDOT.core.models.data import InputData
-from FEDOT.core.repository.tasks import TaskTypesEnum
+from fedot.core.models.data import InputData
+from fedot.core.repository.tasks import TaskTypesEnum
 
 
 def run_xgboost(params: 'ExecutionParams'):

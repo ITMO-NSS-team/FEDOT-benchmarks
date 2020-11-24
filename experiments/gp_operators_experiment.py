@@ -7,12 +7,11 @@ import numpy as np
 
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.viz import show_history_optimization_comparison
-from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
-from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
-from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
-from FEDOT.core.composer.optimisers.regularization import RegularizationTypesEnum
-from FEDOT.core.composer.optimisers.selection import SelectionTypesEnum
-from FEDOT.core.utils import project_root
+from fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
+from fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
+from fedot.core.composer.optimisers.mutation import MutationTypesEnum
+from fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
+from fedot.core.composer.optimisers.selection import SelectionTypesEnum
 
 
 def write_header_to_csv(f):
@@ -45,10 +44,10 @@ def _reduced_history_best(history, generations, pop_size):
 if __name__ == '__main__':
     max_amount_of_time = 400
     step = 400
-    file_path_train = 'cases/data/scoring/scoring_train.csv'
-    full_path_train = os.path.join(str(project_root()), file_path_train)
-    file_path_test = 'cases/data/scoring/scoring_test.csv'
-    full_path_test = os.path.join(str(project_root()), file_path_test)
+    file_path_train = '../test_cases/scoring/data/scoring_train.csv'
+    full_path_train = os.path.join(file_path_train)
+    file_path_test = '../test_cases/scoring/data/scoring_test.csv'
+    full_path_test = os.path.join(file_path_test)
     file_path_result = 'regular_exp.csv'
     history_file = 'history.csv'
     write_header_to_csv(file_path_result)

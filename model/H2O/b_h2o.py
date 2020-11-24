@@ -8,8 +8,8 @@ import os
 import h2o
 
 from benchmark_utils import (get_h2o_connect_config, get_models_hyperparameters)
-from FEDOT.core.models.data import InputData
-from FEDOT.core.models.evaluation.automl_eval import fit_h2o, predict_h2o
+from fedot.core.models.data import InputData
+from fedot.core.models.evaluation.automl_eval import fit_h2o, predict_h2o
 
 CURRENT_PATH = str(os.path.dirname(__file__))
 
