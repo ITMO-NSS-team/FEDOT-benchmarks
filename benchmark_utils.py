@@ -8,7 +8,7 @@ import pandas as pd
 from pmlb import fetch_data
 from pathlib import Path
 
-from FEDOT.core.utils import ensure_directory_exists, get_split_data_paths, \
+from FEDOT.fedot.core.utils import ensure_directory_exists, get_split_data_paths, \
     save_file_to_csv, split_data
 
 

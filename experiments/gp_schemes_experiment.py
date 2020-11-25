@@ -9,13 +9,13 @@ from typing import List
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.viz import show_history_optimization_comparison
 
-from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
-from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
-from FEDOT.core.composer.optimisers.inheritance import GeneticSchemeTypesEnum
-from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
-from FEDOT.core.composer.optimisers.regularization import RegularizationTypesEnum
-from FEDOT.core.composer.optimisers.selection import SelectionTypesEnum
-from FEDOT.core.utils import project_root
+from FEDOT.fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
+from FEDOT.fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
+from FEDOT.fedot.core.composer.optimisers.inheritance import GeneticSchemeTypesEnum
+from FEDOT.fedot.core.composer.optimisers.mutation import MutationTypesEnum
+from FEDOT.fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
+from FEDOT.fedot.core.composer.optimisers.selection import SelectionTypesEnum
+from FEDOT.fedot.core.utils import project_root
 
 
 def write_header_to_csv(f):
@@ -108,7 +108,6 @@ if __name__ == '__main__':
 
                 historical_fitness = [[chain.fitness for chain in pop] for pop in composer.history]
                 history_gp[type_num].append(historical_fitness)
-                print(history_gp)
         time_amount += step
 
     labels = ['parameter-free', 'parameter-free with depth config', 'steady-state', 'steady-state with depth config']

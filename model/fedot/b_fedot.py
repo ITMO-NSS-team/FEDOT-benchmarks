@@ -6,15 +6,15 @@ from pickle import dump, load
 import numpy as np
 
 from benchmark_utils import get_models_hyperparameters
-from FEDOT.core.composer.gp_composer.gp_composer import GPComposer, GPComposerRequirements
-from FEDOT.core.composer.visualisation import ComposerVisualiser
-from FEDOT.core.models.data import InputData
-from FEDOT.core.repository.model_types_repository import ModelTypesRepository
-from FEDOT.core.repository.quality_metrics_repository import \
+from FEDOT.fedot.core.composer.gp_composer.gp_composer import GPComposer, GPComposerRequirements
+from FEDOT.fedot.core.composer.visualisation import ComposerVisualiser
+from FEDOT.fedot.core.models.data import InputData
+from FEDOT.fedot.core.repository.model_types_repository import ModelTypesRepository
+from FEDOT.fedot.core.repository.quality_metrics_repository import \
     (ClassificationMetricsEnum,
      MetricsRepository,
      RegressionMetricsEnum)
-from FEDOT.core.repository.tasks import Task, TaskTypesEnum
+from FEDOT.fedot.core.repository.tasks import Task, TaskTypesEnum
 
 random.seed(1)
 np.random.seed(1)

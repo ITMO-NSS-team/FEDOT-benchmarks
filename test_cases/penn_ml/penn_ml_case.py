@@ -9,7 +9,7 @@ from benchmark_utils import \
     (convert_json_stats_to_csv, get_models_hyperparameters,
      get_penn_case_data_paths, save_metrics_result_file)
 from executor import CaseExecutor, ExecutionParams
-from FEDOT.core.repository.tasks import TaskTypesEnum
+from FEDOT.fedot.core.repository.tasks import TaskTypesEnum
 
 
 def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):

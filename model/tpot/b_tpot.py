@@ -3,9 +3,9 @@ import os
 import joblib
 
 from benchmark_utils import get_models_hyperparameters
-from FEDOT.core.models.data import InputData
-from FEDOT.core.models.evaluation.automl_eval import fit_tpot, predict_tpot_class, predict_tpot_reg
-from FEDOT.core.repository.tasks import Task, TaskTypesEnum
+from FEDOT.fedot.core.models.data import InputData
+from FEDOT.fedot.core.models.evaluation.automl_eval import fit_tpot, predict_tpot_class, predict_tpot_reg
+from FEDOT.fedot.core.repository.tasks import Task, TaskTypesEnum
 
 
 def run_tpot(params: 'ExecutionParams'):

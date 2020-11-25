@@ -5,18 +5,18 @@ from typing import Optional
 import numpy as np
 from sklearn.metrics import roc_auc_score as roc_auc
 
-from FEDOT.core.composer.chain import Chain
-from FEDOT.core.composer.gp_composer.gp_composer import GPComposerBuilder, GPComposerRequirements
-from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
-from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
-from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
-from FEDOT.core.composer.optimisers.regularization import RegularizationTypesEnum
-from FEDOT.core.composer.optimisers.selection import SelectionTypesEnum
-from FEDOT.core.models.data import InputData
-from FEDOT.core.repository.model_types_repository import ModelTypesRepository
-from FEDOT.core.repository.quality_metrics_repository import \
+from FEDOT.fedot.core.composer.chain import Chain
+from FEDOT.fedot.core.composer.gp_composer.gp_composer import GPComposerBuilder, GPComposerRequirements
+from FEDOT.fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
+from FEDOT.fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
+from FEDOT.fedot.core.composer.optimisers.mutation import MutationTypesEnum
+from FEDOT.fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
+from FEDOT.fedot.core.composer.optimisers.selection import SelectionTypesEnum
+from FEDOT.fedot.core.models.data import InputData
+from FEDOT.fedot.core.repository.model_types_repository import ModelTypesRepository
+from FEDOT.fedot.core.repository.quality_metrics_repository import \
     (ClassificationMetricsEnum, MetricsRepository)
-from FEDOT.core.repository.tasks import TaskTypesEnum, Task
+from FEDOT.fedot.core.repository.tasks import TaskTypesEnum, Task
 
 random.seed(1)
 np.random.seed(1)
@@ -40,7 +40,7 @@ def run_credit_scoring_problem(train_file_path, test_file_path,
     dataset_to_validate = InputData.from_csv(test_file_path, task=task)
 
     available_model_types, _ = ModelTypesRepository().suitable_model(task_type=task.task_type)
-    available_model_types.remove('pca_data_model')
+    #available_model_types.remove('pca_data_model')
     # the choice of the metric for the chain quality assessment during composition
     metric_function = MetricsRepository().metric_by_id(ClassificationMetricsEnum.ROCAUC_penalty)
 
@@ -62,9 +62,10 @@ def run_credit_scoring_problem(train_file_path, test_file_path,
         max_depth=max_depth, pop_size=pop_size, num_of_generations=generations,
         crossover_prob=0.8, mutation_prob=0.8, max_lead_time=max_lead_time, add_single_model_chains=False)
 
-    # Create GP-based composer
-    composer = GPComposerBuilder.get_composer(composer_requirements=composer_requirements,
-                                              metrics=metric_function, optimiser_parameters=optimiser_parameters)
+    builder = GPComposerBuilder(task=task).with_requirements(composer_requirements).with_metrics(
+        metric_function).with_optimiser_parameters(optimiser_parameters)
+
+    composer = builder.build()
 
     chain_evo_composed = composer.compose_chain(data=dataset_to_compose,
                                                 is_visualise=False)

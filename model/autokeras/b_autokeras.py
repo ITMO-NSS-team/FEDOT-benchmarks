@@ -1,8 +1,8 @@
 import autokeras as ak
 
 from benchmark_utils import get_models_hyperparameters
-from FEDOT.core.models.data import InputData
-from FEDOT.core.repository.tasks import TaskTypesEnum
+from FEDOT.fedot.core.models.data import InputData
+from FEDOT.fedot.core.repository.tasks import TaskTypesEnum
 
 
 def run_autokeras(params: 'ExecutionParams'):

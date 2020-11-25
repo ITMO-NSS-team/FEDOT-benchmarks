@@ -10,7 +10,7 @@ from baseline.b_xgboost import run_xgboost
 from benchmark_model_types import BenchmarkModelTypesEnum
 from model.fedot.b_fedot import run_fedot
 from model.tpot.b_tpot import run_tpot
-from FEDOT.core.repository.tasks import TaskTypesEnum
+from FEDOT.fedot.core.repository.tasks import TaskTypesEnum
 
 
 def calculate_metrics(metric_list: list, target: list, predicted: list):

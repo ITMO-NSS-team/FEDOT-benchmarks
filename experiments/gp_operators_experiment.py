@@ -6,12 +6,13 @@ import os
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.gp_schemes_experiment import results_preprocess_and_visualisation
 
-from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
-from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
-from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
-from FEDOT.core.composer.optimisers.regularization import RegularizationTypesEnum
-from FEDOT.core.composer.optimisers.selection import SelectionTypesEnum
-from FEDOT.core.utils import project_root
+
+from FEDOT.fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
+from FEDOT.fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
+from FEDOT.fedot.core.composer.optimisers.mutation import MutationTypesEnum
+from FEDOT.fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
+from FEDOT.fedot.core.composer.optimisers.selection import SelectionTypesEnum
+from FEDOT.fedot.core.utils import project_root
 
 
 def write_header_to_csv(f):
@@ -44,9 +45,9 @@ if __name__ == '__main__':
     crossover_types_set = [[CrossoverTypesEnum.subtree], [CrossoverTypesEnum.one_point],
                            [CrossoverTypesEnum.subtree, CrossoverTypesEnum.one_point], [CrossoverTypesEnum.none]]
     history_gp = [[] for _ in range(len(crossover_types_set))]
-    pop_size = 20
-    iterations = 20
-    runs = 8
+    pop_size = 10
+    iterations = 10
+    runs = 4
     while time_amount <= max_amount_of_time:
         for type_num, crossover_type in enumerate(crossover_types_set):
             for run in range(runs):
@@ -75,3 +76,5 @@ if __name__ == '__main__':
         time_amount += step
     labels = ['Subtree crossover', 'One-point crossover', 'All crossover types', 'Without crossover']
     results_preprocess_and_visualisation(history_gp=history_gp, labels=labels, iterations=iterations)
+
+
