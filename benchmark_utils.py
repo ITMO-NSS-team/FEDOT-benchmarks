@@ -8,13 +8,29 @@ import pandas as pd
 from pmlb import fetch_data
 from pathlib import Path
 
-from FEDOT.core.utils import ensure_directory_exists, get_split_data_paths, \
-    save_file_to_csv, split_data
+from fedot.core.utils import save_file_to_csv, split_data
 
 
 def project_root() -> Path:
     """Returns project root folder."""
     return Path(__file__).parent
+
+
+def ensure_directory_exists(dir_names: list):
+    main_dir = os.path.join(str(project_root()), dir_names[0], dir_names[1])
+    dataset_dir = os.path.join(str(project_root()), dir_names[0], dir_names[1], dir_names[2])
+    if not os.path.exists(main_dir):
+        os.mkdir(main_dir)
+    if not os.path.exists(dataset_dir):
+        os.mkdir(dataset_dir)
+
+
+def get_split_data_paths(directory_names: list):
+    train_file_path = os.path.join(directory_names[0], directory_names[1], directory_names[2], 'train.csv')
+    full_train_file_path = os.path.join(str(project_root()), train_file_path)
+    test_file_path = os.path.join(directory_names[0], directory_names[1], directory_names[2], 'test.csv')
+    full_test_file_path = os.path.join(str(project_root()), test_file_path)
+    return full_train_file_path, full_test_file_path
 
 
 def get_scoring_case_data_paths() -> Tuple[str, str]:
@@ -37,7 +53,7 @@ def get_cancer_case_data_paths() -> Tuple[str, str]:
 
 def get_penn_case_data_paths(name_of_dataset: str) -> Tuple[str, str]:
     df = fetch_data(name_of_dataset)
-    directory_names = ['benchmark', 'data', name_of_dataset]
+    directory_names = ['test_cases', 'penn_ml', 'data', name_of_dataset]
     penn_train, penn_test = split_data(df)
     ensure_directory_exists(directory_names)
     full_train_file_path, full_test_file_path = get_split_data_paths(directory_names)
@@ -75,7 +91,7 @@ def save_metrics_result_file(data: dict, file_name: str):
         json.dump(data, file, indent=4)
 
 
-def get_models_hyperparameters(timedelta: int = 10) -> dict:
+def get_models_hyperparameters(timedelta: int = 5) -> dict:
     # MAX_RUNTIME_MINS should be equivalent to MAX_RUNTIME_SECS
 
     tpot_config = {'MAX_RUNTIME_MINS': timedelta,

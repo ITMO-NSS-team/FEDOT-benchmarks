@@ -4,17 +4,18 @@ import random
 from pickle import dump, load
 
 import numpy as np
+from fedot.core.composer.gp_composer.gp_composer import GPComposerBuilder
 
 from benchmark_utils import get_models_hyperparameters
-from FEDOT.core.composer.gp_composer.gp_composer import GPComposer, GPComposerRequirements
-from FEDOT.core.composer.visualisation import ComposerVisualiser
-from FEDOT.core.models.data import InputData
-from FEDOT.core.repository.model_types_repository import ModelTypesRepository
-from FEDOT.core.repository.quality_metrics_repository import \
+from fedot.core.composer.gp_composer.gp_composer import GPComposerRequirements
+from fedot.core.composer.visualisation import ComposerVisualiser
+from fedot.core.models.data import InputData
+from fedot.core.repository.model_types_repository import ModelTypesRepository
+from fedot.core.repository.quality_metrics_repository import \
     (ClassificationMetricsEnum,
      MetricsRepository,
      RegressionMetricsEnum)
-from FEDOT.core.repository.tasks import Task, TaskTypesEnum
+from fedot.core.repository.tasks import Task, TaskTypesEnum
 
 random.seed(1)
 np.random.seed(1)
@@ -69,8 +70,12 @@ def run_fedot(params: 'ExecutionParams'):
         models_repo = ModelTypesRepository()
         available_model_types, _ = models_repo.suitable_model(task.task_type)
 
+        heavy_models = ['mlp', 'svc']
+        available_model_types = [model for model in available_model_types if model not in heavy_models]
+
         metric_function = MetricsRepository().metric_by_id(metric)
 
+        # the choice and initialisation of the GP search
         composer_requirements = GPComposerRequirements(
             primary=available_model_types,
             secondary=available_model_types, max_arity=3,
@@ -78,19 +83,16 @@ def run_fedot(params: 'ExecutionParams'):
             crossover_prob=0.8, mutation_prob=0.8, max_lead_time=datetime.timedelta(minutes=cur_lead_time))
 
         # Create GP-based composer
-        composer = GPComposer()
+        builder = GPComposerBuilder(task).with_requirements(composer_requirements).with_metrics(metric_function)
+        gp_composer = builder.build()
 
-        # the optimal chain generation by composition - the most time-consuming task
-        chain_evo_composed = composer.compose_chain(data=dataset_to_compose,
-                                                    initial_chain=None,
-                                                    composer_requirements=composer_requirements,
-                                                    metrics=metric_function, is_visualise=False)
-        chain_evo_composed.fine_tune_primary_nodes(input_data=dataset_to_compose, iterations=50)
-        chain_evo_composed.fit(input_data=dataset_to_compose, verbose=False)
-        save_fedot_model(chain_evo_composed, saved_model_name)
+        chain_gp_composed = gp_composer.compose_chain(data=dataset_to_compose)
+
+        chain_gp_composed.fit_from_scratch(input_data=dataset_to_compose)
+        save_fedot_model(chain_gp_composed, saved_model_name)
     else:
-        chain_evo_composed = loaded_model
+        chain_gp_composed = loaded_model
 
-    evo_predicted = chain_evo_composed.predict(dataset_to_validate)
+    evo_predicted = chain_gp_composed.predict(dataset_to_validate)
 
     return dataset_to_validate.target, evo_predicted.predict

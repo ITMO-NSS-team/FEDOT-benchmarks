@@ -7,12 +7,12 @@ import numpy as np
 
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.viz import show_history_optimization_comparison
-from FEDOT.core.composer.optimisers.crossover import CrossoverTypesEnum
-from FEDOT.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
-from FEDOT.core.composer.optimisers.mutation import MutationTypesEnum
-from FEDOT.core.composer.optimisers.regularization import RegularizationTypesEnum
-from FEDOT.core.composer.optimisers.selection import SelectionTypesEnum
-from FEDOT.core.utils import project_root
+from fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
+from fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters, GeneticSchemeTypesEnum
+from fedot.core.composer.optimisers.mutation import MutationTypesEnum
+from fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
+from fedot.core.composer.optimisers.selection import SelectionTypesEnum
+from fedot.core.utils import project_root
 
 
 def write_header_to_csv(f):

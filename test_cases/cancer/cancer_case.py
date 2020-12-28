@@ -1,7 +1,7 @@
 from benchmark_model_types import BenchmarkModelTypesEnum
 from benchmark_utils import get_cancer_case_data_paths, get_models_hyperparameters, save_metrics_result_file
 from executor import CaseExecutor, ExecutionParams
-from FEDOT.core.repository.tasks import TaskTypesEnum
+from fedot.core.repository.tasks import TaskTypesEnum
 
 if __name__ == '__main__':
     train_file, test_file = get_cancer_case_data_paths()

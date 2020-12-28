@@ -2,14 +2,14 @@ from pathlib import Path
 
 import pandas as pd
 from pmlb import classification_dataset_names, fetch_data, regression_dataset_names
-from pmlb.write_metadata import imbalance_metrics
+from pmlb.support_funcs import compute_imbalance
 
 from benchmark_model_types import BenchmarkModelTypesEnum
 from benchmark_utils import \
     (convert_json_stats_to_csv, get_models_hyperparameters,
      get_penn_case_data_paths, save_metrics_result_file)
 from executor import CaseExecutor, ExecutionParams
-from FEDOT.core.repository.tasks import TaskTypesEnum
+from fedot.core.repository.tasks import TaskTypesEnum
 
 
 def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
@@ -35,7 +35,8 @@ if __name__ == '__main__':
 
     for name_of_dataset in dataset:
         pmlb_data = fetch_data(name_of_dataset)
-        num_classes, _ = imbalance_metrics(pmlb_data['target'].tolist())
+        imbalance_report = compute_imbalance(pmlb_data['target'].values.tolist())
+        num_classes = imbalance_report[0]
         problem_class, metric_names = _problem_and_metric_for_dataset(name_of_dataset, num_classes)
         if not problem_class or not metric_names:
             print(f'Incorrect dataset: {name_of_dataset}')
