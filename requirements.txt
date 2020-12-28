@@ -6,7 +6,7 @@ pmlb==1.0.2a0
 numpy==1.18.2
 scikit-learn==0.22.1
 hyperopt==0.2.3
-pandas==0.25.3
+pandas==1.0.3
 xgboost==1.2.0
 scipy==1.4.1
 networkx==2.2

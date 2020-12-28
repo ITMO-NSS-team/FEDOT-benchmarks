@@ -34,7 +34,10 @@ if __name__ == '__main__':
         dataset = classification_dataset_names + regression_dataset_names
 
     for name_of_dataset in dataset:
-        pmlb_data = fetch_data(name_of_dataset)
+        try:
+            pmlb_data = fetch_data(name_of_dataset)
+        except ValueError:
+            continue
         imbalance_report = compute_imbalance(pmlb_data['target'].values.tolist())
         num_classes = imbalance_report[0]
         problem_class, metric_names = _problem_and_metric_for_dataset(name_of_dataset, num_classes)

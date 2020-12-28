@@ -91,7 +91,7 @@ def save_metrics_result_file(data: dict, file_name: str):
         json.dump(data, file, indent=4)
 
 
-def get_models_hyperparameters(timedelta: int = 5) -> dict:
+def get_models_hyperparameters(timedelta: int = 15) -> dict:
     # MAX_RUNTIME_MINS should be equivalent to MAX_RUNTIME_SECS
 
     tpot_config = {'MAX_RUNTIME_MINS': timedelta,
