@@ -15,6 +15,8 @@ from fedot.core.repository.tasks import TaskTypesEnum
 def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
     if num_classes == 2 and name_of_dataset in classification_dataset_names:
         return TaskTypesEnum.classification, ['roc_auc', 'f1']
+    elif num_classes > 2 and name_of_dataset in classification_dataset_names:
+        return TaskTypesEnum.classification, ['balanced_accuracy']
     elif name_of_dataset in regression_dataset_names:
         return TaskTypesEnum.regression, ['mse', 'r2']
     else:
@@ -36,7 +38,8 @@ if __name__ == '__main__':
     for name_of_dataset in dataset:
         try:
             pmlb_data = fetch_data(name_of_dataset)
-        except ValueError:
+        except ValueError as ex:
+            print(ex)
             continue
         imbalance_report = compute_imbalance(pmlb_data['target'].values.tolist())
         num_classes = imbalance_report[0]
@@ -55,8 +58,7 @@ if __name__ == '__main__':
                                                                  task=problem_class,
                                                                  target_name='target',
                                                                  case_label=case_name),
-                                          models=[BenchmarkModelTypesEnum.tpot,
-                                                  BenchmarkModelTypesEnum.baseline,
+                                          models=[BenchmarkModelTypesEnum.baseline,
                                                   BenchmarkModelTypesEnum.fedot],
                                           metric_list=metric_names).execute()
         except Exception as ex:

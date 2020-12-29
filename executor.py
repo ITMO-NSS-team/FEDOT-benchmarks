@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 import numpy as np
-from sklearn.metrics import f1_score, mean_squared_error, r2_score, roc_auc_score
+from sklearn.metrics import f1_score, mean_squared_error, r2_score, roc_auc_score, balanced_accuracy_score
 
 from model.H2O.b_h2o import run_h2o
 from model.autokeras.b_autokeras import run_autokeras
@@ -13,18 +13,19 @@ from model.tpot.b_tpot import run_tpot
 from fedot.core.repository.tasks import TaskTypesEnum
 
 
-def calculate_metrics(metric_list: list, target: list, predicted: list):
+def calculate_metrics(metric_list: list, target: list, predicted_probs: list, predicted_labels: list):
     metric_dict = {'roc_auc': roc_auc_score,
                    'f1': f1_score,
                    'mse': mean_squared_error,
-                   'r2': r2_score
+                   'r2': r2_score,
+                   'balanced_accuracy': balanced_accuracy_score
                    }
-    target_only_metrics = ['f1', 'accuracy', 'precision']
+    label_only_metrics = ['f1', 'accuracy', 'precision', 'balanced_accuracy']
     result_metric = []
     for metric_name in metric_list:
-        if metric_name in target_only_metrics:
-            bound = np.mean(predicted)
-            predicted = [1 if x >= bound else 0 for x in predicted]
+        predicted = predicted_probs
+        if metric_name in label_only_metrics:
+            predicted = predicted_labels
 
         result_metric.append(round(metric_dict[metric_name](target, predicted), 3))
 
@@ -66,9 +67,10 @@ class CaseExecutor:
 
         for model_type, strategy_func in strategies.items():
             print(f'---------\nRUN {model_type.name}\n---------')
-            target, predicted = strategy_func(self.params)
+            target, predicted, predicted_labels = strategy_func(self.params)
             result[f'{model_type.name}_metric'] = calculate_metrics(self.metric_list,
                                                                     target=target,
-                                                                    predicted=predicted)
+                                                                    predicted_probs=predicted,
+                                                                    predicted_labels=predicted_labels)
 
         return result
