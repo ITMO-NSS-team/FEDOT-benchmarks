@@ -54,7 +54,7 @@ def get_cancer_case_data_paths() -> Tuple[str, str]:
 def get_penn_case_data_paths(name_of_dataset: str) -> Tuple[str, str]:
     df = fetch_data(name_of_dataset)
     directory_names = ['test_cases', 'penn_ml', 'data', name_of_dataset]
-    penn_train, penn_test = split_data(df, 0.2)
+    penn_train, penn_test = split_data(df, 0.5)
     ensure_directory_exists(directory_names)
     full_train_file_path, full_test_file_path = get_split_data_paths(directory_names)
     save_file_to_csv(penn_train, full_train_file_path)

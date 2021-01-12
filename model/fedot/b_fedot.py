@@ -71,16 +71,16 @@ def run_fedot(params: 'ExecutionParams'):
         models_repo = ModelTypesRepository()
         available_model_types, _ = models_repo.suitable_model(task.task_type)
 
-        heavy_models = ['mlp', 'svc', 'multinb', 'tfidf']
+        heavy_models = ['svc', 'multinb', 'tfidf', 'qda']
         available_model_types = [model for model in available_model_types if model not in heavy_models]
 
         # the choice and initialisation of the GP search
         composer_requirements = GPComposerRequirements(
             primary=available_model_types,
             secondary=available_model_types, max_arity=3,
-            max_depth=3, pop_size=population_size, num_of_generations=generations,
+            max_depth=2, pop_size=population_size, num_of_generations=generations,
             crossover_prob=0.8, mutation_prob=0.8, max_lead_time=datetime.timedelta(minutes=cur_lead_time),
-            add_single_model_chains=False)
+            add_single_model_chains=True)
 
         # Create GP-based composer
         builder = GPComposerBuilder(task).with_requirements(composer_requirements).with_metrics(metric_func)
@@ -94,6 +94,6 @@ def run_fedot(params: 'ExecutionParams'):
         chain_gp_composed = loaded_model
 
     evo_predicted = chain_gp_composed.predict(dataset_to_validate)
-    evo_predicted_labels = chain_gp_composed.predict(dataset_to_validate, output_mode='full_probs')
+    evo_predicted_labels = chain_gp_composed.predict(dataset_to_validate, output_mode='labels')
 
     return dataset_to_validate.target, evo_predicted.predict, evo_predicted_labels.predict

@@ -59,7 +59,8 @@ if __name__ == '__main__':
                                                                  target_name='target',
                                                                  case_label=case_name),
                                           models=[BenchmarkModelTypesEnum.baseline,
-                                                  BenchmarkModelTypesEnum.fedot],
+                                                  BenchmarkModelTypesEnum.fedot,
+                                                  BenchmarkModelTypesEnum.tpot],
                                           metric_list=metric_names).execute()
         except Exception as ex:
             print(f'Exception on {name_of_dataset}: {ex}')

@@ -41,12 +41,13 @@ def run_tpot(params: 'ExecutionParams'):
     true_target = predict_data.target
     if task == TaskTypesEnum.regression:
         predicted = predict_tpot_reg(imported_model, predict_data)
+        predicted_labels = predicted
     elif task == TaskTypesEnum.classification:
-        predicted = predict_tpot_class(imported_model, predict_data)
+        predicted, predicted_labels = predict_tpot_class(imported_model, predict_data)
     else:
         print('Incorrect type of ml task')
         raise NotImplementedError()
 
     print(f'BEST_model: {imported_model}')
 
-    return true_target, predicted
+    return true_target, predicted, predicted_labels
