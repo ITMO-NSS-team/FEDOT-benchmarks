@@ -1,8 +1,10 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import seaborn as sns
+
 from itertools import cycle
 from typing import List
-
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 def fitness_by_generations_boxplots(history_runs, iterations):
@@ -48,4 +50,32 @@ def show_history_optimization_comparison(optimisers_fitness_history: List[List[i
     plt.ylabel('Best fitness', fontsize=13)
     plt.xlabel('Generation, #', fontsize=13)
     plt.tight_layout()
+    plt.show()
+
+
+def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
+                                 objectives_names=('ROC-AUC penalty metric', 'Computation time'), save=False):
+    fig, ax = plt.subplots()
+    current_palette = sns.color_palette('Dark2')
+    for i, pareto_front in enumerate(fronts):
+        color = np.array(current_palette[i])
+        c = color.reshape(1, -1)
+        ax.scatter(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], c=c)
+        ax.plot(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], color=color, label = labels[i])
+    plt.xlabel(objectives_names[0], fontsize=15)
+    plt.ylabel(objectives_names[1], fontsize=15)
+    plt.yticks(fontsize=12)
+    ax.set_title('Pareto front', fontsize=15)
+    ax.legend(loc='lower right', shadow=False, fontsize=15)
+    fig.set_figwidth(8)
+    fig.set_figheight(8)
+    plt.show()
+    if save:
+        if not os.path.isdir('../../tmp'):
+            os.mkdir('../../tmp')
+
+        file_name = 'pareto_fronts_comp.png'
+        path = f'../../tmp/{file_name}'
+        plt.savefig(path, bbox_inches='tight')
+
     plt.show()
