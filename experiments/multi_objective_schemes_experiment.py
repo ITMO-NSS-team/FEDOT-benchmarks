@@ -4,6 +4,9 @@ import os
 from pathlib import Path
 
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
+from experiments.gp_schemes_experiment import write_header_to_csv, add_result_to_csv, \
+    results_preprocess_and_quality_visualisation
+from experiments.viz import viz_pareto_fronts_comparison
 
 from fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
 from fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
@@ -13,9 +16,6 @@ from fedot.core.composer.optimisers.regularization import RegularizationTypesEnu
 from fedot.core.composer.optimisers.selection import SelectionTypesEnum
 from fedot.core.repository.quality_metrics_repository import ClassificationMetricsEnum, ComplexityMetricsEnum, \
     MetricsRepository
-from experiments.gp_schemes_experiment import write_header_to_csv, add_result_to_csv, \
-    results_preprocess_and_quality_visualisation
-from experiments.viz import viz_pareto_fronts_comparison
 
 all_results_chains_file = 'all_result_chains.csv'
 
@@ -158,7 +158,7 @@ def exp_multi_obj_selections():
     metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
     selection_types = [[SelectionTypesEnum.nsga2], [SelectionTypesEnum.spea2]]
     depth_config_option = [False, False]  # depth configuration option (Active/No active)
-    run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=3,
+    run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=4,
                       metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
                       visualize_pareto=True, pop_sizes=pop_sizes, iterations=3)
 
