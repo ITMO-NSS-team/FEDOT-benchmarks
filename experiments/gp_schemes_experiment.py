@@ -2,10 +2,9 @@ import csv
 import datetime
 import gc
 import os
-from pathlib import Path
 
 import numpy as np
-
+from pathlib import Path
 from typing import List
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.viz import show_history_optimization_comparison
@@ -17,8 +16,10 @@ from fedot.core.composer.optimisers.mutation import MutationTypesEnum
 from fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
 from fedot.core.composer.optimisers.selection import SelectionTypesEnum
 
+
 def proj_root():
     return Path(__file__).parent.parent
+
 
 def write_header_to_csv(f, row: List[str] = None):
     f = f'../../tmp/{f}'
@@ -36,9 +37,7 @@ def add_result_to_csv(f, t_opt, regular, auc, n_models, n_layers, exp_number=Non
     with open(f, 'a', newline='') as file:
         writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         row = [t_opt, regular, auc, n_models, n_layers]
-        if iteration:
-            iteration = iteration + 1
-        for col in [complexity, iteration, exp_number]:
+        for col in [complexity, iteration + 1, exp_number]:
             if col is not None:
                 row.insert(0, col)
         writer.writerow(row)
@@ -111,8 +110,6 @@ if __name__ == '__main__':
                                                                       pop_size=pop_size, generations=iterations,
                                                                       max_depth=max_depth_in_exp)
 
-                chain = chain[0]
-                roc_auc = roc_auc[0]
                 is_regular = regular_type == RegularizationTypesEnum.decremental
                 add_result_to_csv(file_path_result, time_amount, is_regular, round(roc_auc, 4), len(chain.nodes),
                                   chain.depth)

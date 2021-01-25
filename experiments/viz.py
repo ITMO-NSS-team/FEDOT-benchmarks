@@ -39,16 +39,17 @@ def show_fitness_history_all(history_runs, iterations, with_bands=False):
 
 
 def show_history_optimization_comparison(optimisers_fitness_history: List[List[int]], iterations: List[int],
-                                         labels: List[str]):
-    color_to_take = cycle('bgrcmykw')
+                                         labels: List[str], color_pallete: str = 'bgrcmykw', xlabel='Generation, #',
+                                         ylabel='Best fitness'):
+    color_to_take = cycle(color_pallete)
     plt.yticks(fontsize=12)
     for fitness_history in optimisers_fitness_history:
         sns.tsplot(fitness_history, iterations, legend=True, color=next(color_to_take))
 
     plt.xticks(range(0, max(iterations)), fontsize=13)
     plt.legend(labels=labels, loc='lower right', fontsize=12)
-    plt.ylabel('Best fitness', fontsize=13)
-    plt.xlabel('Generation, #', fontsize=13)
+    plt.ylabel(ylabel, fontsize=13)
+    plt.xlabel(xlabel, fontsize=13)
     plt.tight_layout()
     plt.show()
 
@@ -61,7 +62,7 @@ def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
         color = np.array(current_palette[i])
         c = color.reshape(1, -1)
         ax.scatter(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], c=c)
-        ax.plot(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], color=color, label = labels[i])
+        ax.plot(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], color=color, label=labels[i])
     plt.xlabel(objectives_names[0], fontsize=15)
     plt.ylabel(objectives_names[1], fontsize=15)
     plt.yticks(fontsize=12)

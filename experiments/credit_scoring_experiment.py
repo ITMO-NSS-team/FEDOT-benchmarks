@@ -62,7 +62,7 @@ def run_credit_scoring_problem(train_file_path, test_file_path,
         secondary=available_model_types, max_arity=4,
         max_depth=max_depth, pop_size=pop_size, num_of_generations=generations,
         crossover_prob=0.8, mutation_prob=0.8, max_lead_time=max_lead_time, add_single_model_chains=False,
-        start_depth=start_depth)
+        start_depth=start_depth, model_fit_time_constraint=200)
 
     # Create GP-based composer
     builder = GPComposerBuilder(task=task).with_requirements(composer_requirements).with_metrics(
@@ -85,6 +85,7 @@ def run_credit_scoring_problem(train_file_path, test_file_path,
 
                 chains_roc_auc.append(roc_on_valid_evo_composed)
                 chains_complexity.append(complexity_metric)
+
         calculated_metrics = [chains_roc_auc, chains_complexity]
     else:
         chains_evo_composed.fit(input_data=dataset_to_compose, verbose=True)

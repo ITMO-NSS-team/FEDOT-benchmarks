@@ -3,7 +3,6 @@ import datetime
 import gc
 import os
 from pathlib import Path
-
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
 from experiments.gp_schemes_experiment import results_preprocess_and_quality_visualisation
 
@@ -71,8 +70,6 @@ if __name__ == '__main__':
                                                                       gp_optimiser_params=optimiser_parameters,
                                                                       pop_size=pop_size, generations=iterations)
 
-                chain = chain[0]
-                roc_auc = roc_auc[0]
                 is_regular = regular_type == RegularizationTypesEnum.decremental
                 add_result_to_csv(file_path_result, time_amount, is_regular, round(roc_auc, 4), len(chain.nodes),
                                   chain.depth)
