@@ -30,13 +30,16 @@ def proj_root():
 def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, genetic_schemes_set=None,
                       depth_config=None, iterations=10,
                       runs=1, pop_sizes=(10, 10, 20, 20), crossover_types=None, metrics=None, mutation_types=None,
-                      regular_type=RegularizationTypesEnum.decremental, visualize_pareto=False, visualize_hv=False):
+                      regular_type=RegularizationTypesEnum.decremental, train_path=None, test_path=None,
+                      visualize_pareto=False, visualize_hv=False):
     max_amount_of_time = 800
     step = 800
     file_path_train = 'test_cases/scoring/data/scoring_train.csv'
     full_path_train = os.path.join(str(proj_root()), file_path_train)
+    full_path_train = train_path
     file_path_test = 'test_cases/scoring/data/scoring_test.csv'
     full_path_test = os.path.join(str(proj_root()), file_path_test)
+    full_path_test = test_path
     file_path_result = 'multiobj_exp_all.csv'
     file_path_best = 'multiobj_exp_best.csv'
     row = ['exp_number', 'iteration', 'complexity', 't_opt', 'regular', 'AUC', 'n_models', 'n_layers']
@@ -90,9 +93,15 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
 
                 is_regular = regular_type == RegularizationTypesEnum.decremental
 
-                historical_fit = [[[obj for obj in chain.fitness.values] for chain in pop] for pop
-                                  in
-                                  composer.history.individuals]
+                try:
+                    historical_fit = [[[obj for obj in chain.fitness.values] for chain in pop] for pop
+                                      in
+                                      composer.history.individuals]
+                except Exception as ex:
+                    print(ex)
+                    historical_fit = [[[chain.fitness] for chain in pop] for pop
+                                      in
+                                      composer.history.individuals]
                 fitness_history_gp[type_num].append(historical_fit)
                 inds_history_gp[type_num].append(composer.history.individuals)
 
@@ -159,7 +168,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                                              labels=labels, color_pallete=color_pallete, ylabel='Hypervolume')
 
 
-def exp_self_config_vs_fix_params():
+def exp_self_config_vs_fix_params(train_path: str,
+                                  test_path: str):
     history_file = 'history_selfconf_vs_fixparams.csv'
     labels = ['parameter-free', 'parameter-free with depth config', 'steady-state',
               'steady-state with depth config']
@@ -171,10 +181,12 @@ def exp_self_config_vs_fix_params():
     depth_config_option = [False, True, False, True]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=3,
                       metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
+                      train_path=train_path, test_path=test_path,
                       visualize_pareto=True, visualize_hv=True)
 
 
-def exp_single_vs_multi_objective():
+def exp_single_vs_multi_objective(train_path: str,
+                                  test_path: str):
     history_file = 'history_single_vs_multiobj.csv'
     labels = ['steady_state single-obj', 'steady_state single-obj penalty', 'steady-state multi-obj']
     runs = 4
@@ -186,10 +198,12 @@ def exp_single_vs_multi_objective():
     selection_types = [single_obj_sel, single_obj_sel, multi_obj_sel]
     depth_config_option = [False, False, False, False]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=runs,
-                      metrics=metrics, selection_types=selection_types, depth_config=depth_config_option)
+                      metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
+                      train_path=train_path, test_path=test_path,)
 
 
-def exp_multi_obj_selections():
+def exp_multi_obj_selections(train_path: str,
+                             test_path: str):
     history_file = 'history_selfconf_vs_fixparams.csv'
     labels = ['nsga selection', 'spea2 selection']
     genetic_schemes_set = [GeneticSchemeTypesEnum.parameter_free, GeneticSchemeTypesEnum.parameter_free]
@@ -198,6 +212,7 @@ def exp_multi_obj_selections():
     depth_config_option = [False, False]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=4,
                       metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
+                      train_path=train_path, test_path=test_path,
                       visualize_pareto=True)
 
 
