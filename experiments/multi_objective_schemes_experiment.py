@@ -218,7 +218,22 @@ def exp_multi_obj_selections(train_path: str,
                       visualize_pareto=True)
 
 
+def exp_complexity_metrics():
+    history_file = 'history_selfconf_vs_fixparams.csv'
+    labels = ['computation time', 'structural complexity']
+    genetic_schemes_set = [GeneticSchemeTypesEnum.steady_state, GeneticSchemeTypesEnum.steady_state]
+    metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time],
+               [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.structural]]
+    multi_obj_sel = [SelectionTypesEnum.nsga2, SelectionTypesEnum.spea2]
+    selection_types = [multi_obj_sel, multi_obj_sel]
+    depth_config_option = [False, False]  # depth configuration option (Active/No active)
+    run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=4,
+                      metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
+                      visualize_hv=True)
+
+
 if __name__ == '__main__':
     # exp_single_vs_multi_objective()
     exp_self_config_vs_fix_params()
     # exp_multi_obj_selections()
+    # exp_complexity_metrics()
