@@ -114,8 +114,10 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                 pareto_fronts_metrics.append(calculated_metrics)
 
                 if type(metric) is list:
-                    historical_quality = [[-chain.fitness.values[0] for chain in pop] for pop in
-                                          composer.history.individuals]
+                    historical_quality = [
+                        [-chain.fitness.values[0] for chain in pop] + [-chain.fitness.values[0] for chain in
+                                                                       composer.history.archive_history[i]] for i, pop
+                        in enumerate(composer.history.individuals)]
                     history_quality_gp[type_num].append(historical_quality)
 
                 else:
@@ -151,8 +153,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
             for run_num, run_history in enumerate(exp_history):
                 all_objectives = ComposerVisualiser.objectives_transform(run_history, objectives_numbers=(0, 1),
                                                                          transform_from_minimization=False)
-                max_qual.append(max(all_objectives[0]))
-                max_compl.append(max(all_objectives[1]))
+                max_qual.append(max(all_objectives[0]) + 0.01)
+                max_compl.append(max(all_objectives[1]) + 0.01)
             exps_ref_points.append((max(max_qual), max(max_compl)))
 
         hv_set = []
@@ -199,7 +201,7 @@ def exp_single_vs_multi_objective(train_path: str,
     depth_config_option = [False, False, False, False]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=runs,
                       metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
-                      train_path=train_path, test_path=test_path,)
+                      train_path=train_path, test_path=test_path, )
 
 
 def exp_multi_obj_selections(train_path: str,
