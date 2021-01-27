@@ -35,9 +35,15 @@ if __name__ == '__main__':
             print(f'Incorrect dataset: {name_of_dataset}')
             continue
         train_file, test_file = get_penn_case_data_paths(name_of_dataset)
+        model = multi_model.exp_single_vs_multi_objective(train_path=train_file,
+                                                          test_path=test_file,
+                                                          name_of_dataset=name_of_dataset)
         model = multi_model.exp_self_config_vs_fix_params(train_path=train_file,
-                                                          test_path=test_file)
+                                                          test_path=test_file,
+                                                          name_of_dataset=name_of_dataset)
         model = multi_model.exp_multi_obj_selections(train_path=train_file,
-                                                     test_path=test_file)
-        # model = multi_model.exp_single_vs_multi_objective(train_path=train_file,
-        #                                                   test_path=test_file)
+                                                     test_path=test_file,
+                                                     name_of_dataset=name_of_dataset)
+        model = multi_model.exp_complexity_metrics(train_path=train_file,
+                                                   test_path=test_file,
+                                                   name_of_dataset=name_of_dataset)

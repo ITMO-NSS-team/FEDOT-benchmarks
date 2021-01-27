@@ -7,7 +7,7 @@ from itertools import cycle
 from typing import List
 
 
-def fitness_by_generations_boxplots(history_runs, iterations):
+def fitness_by_generations_boxplots(history_runs, iterations, name_of_dataset=None, save=True):
     iters = [it for it in range(iterations)]
     fitness_by_iter = []
     for it in iters:
@@ -21,9 +21,18 @@ def fitness_by_generations_boxplots(history_runs, iterations):
     plt.ylabel('Fitness')
     plt.xlabel('Generation, #')
     plt.show()
+    if save:
+        if not os.path.isdir('../../tmp'):
+            os.mkdir('../../tmp')
+
+        file_name = name_of_dataset + '_fitness_by_generations_boxplots.png'
+        path = f'../../tmp/{file_name}'
+        plt.savefig(path, bbox_inches='tight')
+
+    plt.show()
 
 
-def show_fitness_history_all(history_runs, iterations, with_bands=False):
+def show_fitness_history_all(history_runs, iterations, name_of_dataset=None, with_bands=False, save=True):
     color_to_take = cycle('bgrcmykw')
     iters = [it for it in range(iterations)]
 
@@ -36,11 +45,20 @@ def show_fitness_history_all(history_runs, iterations, with_bands=False):
     plt.ylabel('Fitness')
     plt.xlabel('Iteration, #')
     plt.show()
+    if save:
+        if not os.path.isdir('../../tmp'):
+            os.mkdir('../../tmp')
+
+        file_name = name_of_dataset + '_pareto_fronts_comp.png'
+        path = f'../../tmp/{file_name}'
+        plt.savefig(path, bbox_inches='tight')
+
+    plt.show()
 
 
 def show_history_optimization_comparison(optimisers_fitness_history: List[List[int]], iterations: List[int],
                                          labels: List[str], color_pallete: str = 'bgrcmykw', xlabel='Generation, #',
-                                         ylabel='Best fitness'):
+                                         ylabel='Best fitness',name_of_dataset=None, save=True):
     color_to_take = cycle(color_pallete)
     plt.yticks(fontsize=12)
     for fitness_history in optimisers_fitness_history:
@@ -52,10 +70,20 @@ def show_history_optimization_comparison(optimisers_fitness_history: List[List[i
     plt.xlabel(xlabel, fontsize=13)
     plt.tight_layout()
     plt.show()
+    if save:
+        if not os.path.isdir('../../tmp'):
+            os.mkdir('../../tmp')
+
+        file_name = name_of_dataset+'_pareto_fronts_comp.png'
+        path = f'../../tmp/{file_name}'
+        plt.savefig(path, bbox_inches='tight')
+
+    plt.show()
 
 
 def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
-                                 objectives_names=('ROC-AUС metric', 'Computation time'), save=False):
+                                 objectives_names=('ROC-AUC penalty metric', 'Computation time'),
+                                 name_of_dataset=None, save=True):
     fig, ax = plt.subplots()
     current_palette = sns.color_palette('Dark2')
     for i, pareto_front in enumerate(fronts):
@@ -75,7 +103,7 @@ def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
         if not os.path.isdir('../../tmp'):
             os.mkdir('../../tmp')
 
-        file_name = 'pareto_fronts_comp.png'
+        file_name = name_of_dataset + '_pareto_fronts_comp.png'
         path = f'../../tmp/{file_name}'
         plt.savefig(path, bbox_inches='tight')
 

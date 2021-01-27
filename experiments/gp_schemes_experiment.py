@@ -54,13 +54,14 @@ def _reduced_history_best(history: List[List[float]]):
     return reduced
 
 
-def results_preprocess_and_quality_visualisation(history_gp, labels, iterations):
+def results_preprocess_and_quality_visualisation(history_gp, labels, iterations,name_of_dataset=None):
     reduced_fitness_gp = [[] for _ in range(len(history_gp))]
     for launch_num in range(len(history_gp)):
         for history in history_gp[launch_num]:
             fitness = _reduced_history_best(history)
             reduced_fitness_gp[launch_num].append(fitness)
-    np.save('reduced_fitness_gp', reduced_fitness_gp)
+    path_to_save = name_of_dataset+'_reduced_fitness_gp'
+    np.save(path_to_save, reduced_fitness_gp)
     show_history_optimization_comparison(optimisers_fitness_history=reduced_fitness_gp,
                                          iterations=[_ for _ in range(iterations)],
                                          labels=labels)
