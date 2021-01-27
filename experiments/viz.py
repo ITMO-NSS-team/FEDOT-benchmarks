@@ -55,7 +55,7 @@ def show_history_optimization_comparison(optimisers_fitness_history: List[List[i
 
 
 def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
-                                 objectives_names=('ROC-AUC penalty metric', 'Computation time'), save=False):
+                                 objectives_names=('ROC-AUС metric', 'Computation time'), save=False):
     fig, ax = plt.subplots()
     current_palette = sns.color_palette('Dark2')
     for i, pareto_front in enumerate(fronts):
@@ -63,8 +63,8 @@ def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
         c = color.reshape(1, -1)
         ax.scatter(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], c=c)
         ax.plot(pareto_front[objectives_order[0]], pareto_front[objectives_order[1]], color=color, label=labels[i])
-    plt.xlabel(objectives_names[0], fontsize=15)
-    plt.ylabel(objectives_names[1], fontsize=15)
+    plt.xlabel(objectives_names[objectives_order[0]], fontsize=15)
+    plt.ylabel(objectives_names[objectives_order[1]], fontsize=15)
     plt.yticks(fontsize=12)
     ax.set_title('Pareto front', fontsize=15)
     ax.legend(loc='lower right', shadow=False, fontsize=15)

@@ -32,12 +32,13 @@ def write_header_to_csv(f, row: List[str] = None):
         writer.writerow(row)
 
 
-def add_result_to_csv(f, t_opt, regular, auc, n_models, n_layers, exp_number=None, iteration=None, complexity=None):
+def add_result_to_csv(f, t_opt, regular, auc, n_models, n_layers, exp_number=None, iteration=None, complexity=None,
+                      exp_type=None):
     f = f'../../tmp/{f}'
     with open(f, 'a', newline='') as file:
         writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         row = [t_opt, regular, auc, n_models, n_layers]
-        for col in [complexity, iteration + 1, exp_number]:
+        for col in [complexity, iteration + 1, exp_type, exp_number]:
             if col is not None:
                 row.insert(0, col)
         writer.writerow(row)

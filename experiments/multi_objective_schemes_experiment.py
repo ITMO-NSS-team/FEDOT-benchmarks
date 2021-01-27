@@ -105,13 +105,19 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                 fitness_history_gp[type_num].append(historical_fit)
                 inds_history_gp[type_num].append(composer.history.individuals)
 
+                if visualize_pareto:
+                    archive_len = len(composer.history.archive_history)
+                    pareto_front = composer.history.archive_history[archive_len - 1]
+                    roc_auc_list = [-ind.fitness.values[0] for ind in pareto_front]
+                    complexity_list = [ind.fitness.values[1] for ind in pareto_front]
+
+                    pareto_fronts_metrics.append([roc_auc_list, complexity_list])
+
                 if type(metric) is list:
                     roc_auc_metrics = calculated_metrics[0]
                     complexity_metrics = calculated_metrics[1]
                 else:
                     roc_auc_metrics = calculated_metrics
-
-                pareto_fronts_metrics.append(calculated_metrics)
 
                 if type(metric) is list:
                     historical_quality = [
@@ -132,8 +138,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
 
                     add_result_to_csv(file_path_best, time_amount, is_regular, round(roc_auc, 4),
                                       len(chains[i].nodes),
-                                      chains[i].depth, exp_number=labels[type_num], iteration=run,
-                                      complexity=compl)
+                                      chains[i].depth, exp_type=labels[type_num], iteration=run,
+                                      complexity=compl, exp_number=type_num)
 
         time_amount += step
 
