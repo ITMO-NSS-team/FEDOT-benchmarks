@@ -1,6 +1,7 @@
 import datetime
 import gc
 import os
+
 import numpy as np
 from pathlib import Path
 import seaborn as sns
@@ -28,6 +29,25 @@ def proj_root():
     return Path(__file__).parent.parent
 
 
+def save_composer_history(experiment_path: str,
+                          name_of_experiment: str,
+                          metrics: list,
+                          chains: list,
+                          composer,
+                          history_save_flag: bool = False):
+    metric_save = os.path.join(str(experiment_path), name_of_experiment + '_best_metric')
+    chain_save = os.path.join(str(experiment_path), name_of_experiment + '_best_chains')
+    history_save = os.path.join(str(experiment_path), name_of_experiment + '_composer_history')
+    if history_save_flag:
+        metric_save = os.path.join(str(experiment_path), name_of_experiment + '_history_of_quality')
+        chain_save = os.path.join(str(experiment_path), name_of_experiment + '_history_of_individuals')
+        history_save = os.path.join(str(experiment_path), name_of_experiment + '_history_of_fitness')
+    np.save(metric_save, metrics, allow_pickle=True)
+    np.save(chain_save, chains, allow_pickle=True)
+    np.save(history_save, [composer], allow_pickle=True)
+    return
+
+
 def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, genetic_schemes_set=None,
                       depth_config=None, iterations=10,
                       runs=1, pop_sizes=(10, 10, 20, 20), crossover_types=None, metrics=None, mutation_types=None,
@@ -37,8 +57,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
     step = 800
     full_path_train = train_path
     full_path_test = test_path
-    file_path_result = name_of_dataset +'_multiobj_exp_all.csv'
-    file_path_best = name_of_dataset +'_multiobj_exp_best.csv'
+    file_path_result = name_of_dataset + '_multiobj_exp_all.csv'
+    file_path_best = name_of_dataset + '_multiobj_exp_best.csv'
     row = ['exp_number', 'iteration', 'complexity', 't_opt', 'regular', 'AUC', 'n_models', 'n_layers']
     write_header_to_csv(file_path_result, row=row)
     time_amount = step
@@ -91,6 +111,16 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                 is_regular = regular_type == RegularizationTypesEnum.decremental
 
                 try:
+                    tmp_folder = str(run) + '_experiment'
+                    experiment_path = f'D:\результаты экспериментов\{name_of_dataset}\{tmp_folder}'
+                    if not os.path.isdir(experiment_path):
+                        os.makedirs(experiment_path)
+                    name_of_experiment = name_of_dataset + '_' + labels[type_num] + '_run_number_' + str(run)
+                    save_composer_history(experiment_path, name_of_experiment, calculated_metrics, chains, composer)
+                except Exception as ex:
+                    print(ex)
+
+                try:
                     historical_fit = [[[obj for obj in chain.fitness.values] for chain in pop] for pop
                                       in
                                       composer.history.individuals]
@@ -137,6 +167,16 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                                       len(chains[i].nodes),
                                       chains[i].depth, exp_type=labels[type_num], iteration=run,
                                       complexity=compl, exp_number=type_num)
+                    try:
+                        experiment_path = f'D:\результаты экспериментов\{name_of_dataset}'
+                        if not os.path.isdir(experiment_path):
+                            os.makedirs(experiment_path)
+                        name_of_experiment = name_of_dataset + '_' + labels[type_num] + '_run_number_' + str(run)
+                        save_composer_history(experiment_path, name_of_experiment, history_quality_gp, inds_history_gp,
+                                              fitness_history_gp, history_save_flag=True)
+
+                    except Exception as ex:
+                        print(ex)
 
         time_amount += step
 
@@ -149,8 +189,11 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
         else:
             pareto_metrics = [pareto_fronts_metrics[i] for i in range(0, len(pareto_fronts_metrics), runs)]
         viz_pareto_fronts_comparison(pareto_metrics, labels=labels, name_of_dataset=name_of_dataset)
-        path_to_save_pareto = name_of_dataset + '_pareto_set_gp'
-        np.save(path_to_save_pareto, pareto_metrics)
+        try:
+            path_to_save_pareto = name_of_dataset + '_pareto_set_gp'
+            np.save(path_to_save_pareto, pareto_metrics)
+        except Exception as ex:
+            print(ex)
     if visualize_hv:
         exps_ref_points = []
         for exp_num, exp_history in enumerate(inds_history_gp):
@@ -174,8 +217,11 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                                              iterations=[_ for _ in range(iterations)],
                                              labels=labels, color_pallete=color_pallete, ylabel='Hypervolume',
                                              name_of_dataset=name_of_dataset)
-        path_to_save_hv = name_of_dataset + '_hv_set_gp'
-        np.save(path_to_save_hv, hv_set)
+        try:
+            path_to_save_hv = name_of_dataset + '_hv_set_gp'
+            np.save(path_to_save_hv, hv_set)
+        except Exception as ex:
+            print(ex)
 
 
 def exp_self_config_vs_fix_params(train_path: str,
@@ -199,7 +245,7 @@ def exp_self_config_vs_fix_params(train_path: str,
 def exp_single_vs_multi_objective(train_path: str,
                                   test_path: str,
                                   name_of_dataset: str):
-    history_file = name_of_dataset + 'history_single_vs_multiobj.csv'
+    history_file = name_of_dataset + '_history_single_vs_multiobj.csv'
     labels = ['steady_state single-obj', 'steady_state single-obj penalty', 'steady-state multi-obj']
     runs = 4
     genetic_schemes_set = [GeneticSchemeTypesEnum.steady_state for _ in range(len(labels))]
@@ -216,8 +262,8 @@ def exp_single_vs_multi_objective(train_path: str,
 
 def exp_multi_obj_selections(train_path: str,
                              test_path: str,
-                             name_of_dataset:str):
-    history_file = name_of_dataset + 'history_selfconf_vs_fixparams.csv'
+                             name_of_dataset: str):
+    history_file = name_of_dataset + '_history_selfconf_vs_fixparams.csv'
     labels = ['nsga selection', 'spea2 selection']
     genetic_schemes_set = [GeneticSchemeTypesEnum.parameter_free, GeneticSchemeTypesEnum.parameter_free]
     metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
@@ -230,9 +276,9 @@ def exp_multi_obj_selections(train_path: str,
 
 
 def exp_complexity_metrics(train_path: str,
-                            test_path: str,
+                           test_path: str,
                            name_of_dataset: str):
-    history_file = name_of_dataset + 'history_selfconf_vs_fixparams.csv'
+    history_file = name_of_dataset + '_history_selfconf_vs_fixparams.csv'
     labels = ['computation time', 'structural complexity']
     genetic_schemes_set = [GeneticSchemeTypesEnum.steady_state, GeneticSchemeTypesEnum.steady_state]
     metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time],

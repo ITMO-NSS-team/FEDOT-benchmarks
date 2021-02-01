@@ -18,10 +18,7 @@ def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
 
 
 if __name__ == '__main__':
-    summary_stats = pd.read_csv(r'./datasets/all_summary_stats.tsv', sep='\t')
-    clf_datasets = summary_stats[summary_stats['task'] == 'classification']
-    clf_datasets = clf_datasets[(clf_datasets['n_instances'] > 1000) & (clf_datasets['n_classes'] == 2)]
-    dataset = ['churn', 'dis', 'Hill_Valley_without_noise']
+    dataset = ['Hill_Valley_without_noise']
     for name_of_dataset in dataset:
         try:
             pmlb_data = fetch_data(name_of_dataset)
@@ -35,15 +32,15 @@ if __name__ == '__main__':
             print(f'Incorrect dataset: {name_of_dataset}')
             continue
         train_file, test_file = get_penn_case_data_paths(name_of_dataset)
-        model = multi_model.exp_single_vs_multi_objective(train_path=train_file,
-                                                          test_path=test_file,
-                                                          name_of_dataset=name_of_dataset)
-        model = multi_model.exp_self_config_vs_fix_params(train_path=train_file,
-                                                          test_path=test_file,
-                                                          name_of_dataset=name_of_dataset)
+        # model = multi_model.exp_single_vs_multi_objective(train_path=train_file,
+        #                                                   test_path=test_file,
+        #                                                   name_of_dataset=name_of_dataset)
+        # model = multi_model.exp_self_config_vs_fix_params(train_path=train_file,
+        #                                                    test_path=test_file,
+        #                                                    name_of_dataset=name_of_dataset)
         model = multi_model.exp_multi_obj_selections(train_path=train_file,
                                                      test_path=test_file,
                                                      name_of_dataset=name_of_dataset)
-        model = multi_model.exp_complexity_metrics(train_path=train_file,
-                                                   test_path=test_file,
-                                                   name_of_dataset=name_of_dataset)
+        # model = multi_model.exp_complexity_metrics(train_path=train_file,
+        #                                            test_path=test_file,
+        #                                            name_of_dataset=name_of_dataset)

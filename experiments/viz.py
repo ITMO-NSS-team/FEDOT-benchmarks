@@ -20,7 +20,6 @@ def fitness_by_generations_boxplots(history_runs, iterations, name_of_dataset=No
     plt.title('Fitness history by generations')
     plt.ylabel('Fitness')
     plt.xlabel('Generation, #')
-    plt.show()
     if save:
         if not os.path.isdir('../../tmp'):
             os.mkdir('../../tmp')
@@ -44,12 +43,11 @@ def show_fitness_history_all(history_runs, iterations, name_of_dataset=None, wit
         sns.tsplot(history_runs, iters, legend=True, color=next(color_to_take))
     plt.ylabel('Fitness')
     plt.xlabel('Iteration, #')
-    plt.show()
     if save:
         if not os.path.isdir('../../tmp'):
             os.mkdir('../../tmp')
 
-        file_name = name_of_dataset + '_pareto_fronts_comp.png'
+        file_name = name_of_dataset + '_fitness_history_all.png'
         path = f'../../tmp/{file_name}'
         plt.savefig(path, bbox_inches='tight')
 
@@ -69,12 +67,14 @@ def show_history_optimization_comparison(optimisers_fitness_history: List[List[i
     plt.ylabel(ylabel, fontsize=13)
     plt.xlabel(xlabel, fontsize=13)
     plt.tight_layout()
-    plt.show()
     if save:
         if not os.path.isdir('../../tmp'):
             os.mkdir('../../tmp')
 
-        file_name = name_of_dataset+'_pareto_fronts_comp.png'
+        if ylabel == 'Hypervolume':
+            file_name = name_of_dataset+'_Hypervolume_comparison.png'
+        else:
+            file_name = name_of_dataset+'_history_optimization_comparison.png'
         path = f'../../tmp/{file_name}'
         plt.savefig(path, bbox_inches='tight')
 
@@ -98,7 +98,6 @@ def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
     ax.legend(loc='lower right', shadow=False, fontsize=15)
     fig.set_figwidth(8)
     fig.set_figheight(8)
-    plt.show()
     if save:
         if not os.path.isdir('../../tmp'):
             os.mkdir('../../tmp')

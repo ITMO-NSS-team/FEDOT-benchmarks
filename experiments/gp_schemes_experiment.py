@@ -64,7 +64,7 @@ def results_preprocess_and_quality_visualisation(history_gp, labels, iterations,
     np.save(path_to_save, reduced_fitness_gp)
     show_history_optimization_comparison(optimisers_fitness_history=reduced_fitness_gp,
                                          iterations=[_ for _ in range(iterations)],
-                                         labels=labels)
+                                         labels=labels, name_of_dataset=name_of_dataset)
 
 
 if __name__ == '__main__':
