@@ -49,26 +49,27 @@ def save_composer_history(experiment_path: str,
 
 
 def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, genetic_schemes_set=None,
-                      depth_config=None, iterations=10,
-                      runs=1, pop_sizes=(10, 10, 20, 20), crossover_types=None, metrics=None, mutation_types=None,
+                      depth_config=None, iterations=20,
+                      runs=1, pop_sizes=(20, 20, 20, 20), crossover_types=None, metrics=None, mutation_types=None,
                       regular_type=RegularizationTypesEnum.decremental, train_path=None, test_path=None,
-                      name_of_dataset=None, visualize_pareto=False, visualize_hv=False):
+                      name_of_dataset=None, visualize_pareto=False, visualize_hv=False,
+                      objectives_names=('ROC-AUC metric', 'Computation time')):
     max_amount_of_time = 800
     step = 800
     full_path_train = train_path
     full_path_test = test_path
     file_path_result = name_of_dataset + '_multiobj_exp_all.csv'
     file_path_best = name_of_dataset + '_multiobj_exp_best.csv'
-    row = ['exp_number', 'iteration', 'complexity', 't_opt', 'regular', 'AUC', 'n_models', 'n_layers']
-    write_header_to_csv(file_path_result, row=row)
+    row = ['exp_number', 'exp_type', 'iteration', 'complexity', 't_opt', 'regular', 'AUC', 'n_models', 'n_layers']
+    write_header_to_csv(file_path_best, row=row)
     time_amount = step
     if not metrics:
         metrics = [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time]
     max_depths = [3, 3, 3, 3]
     start_depth = [2, 2, 2, 2]  # starting depth for 1st population initialization
-    history_quality_gp = [[] for _ in range(len(genetic_schemes_set))]
-    inds_history_gp = [[] for _ in range(len(genetic_schemes_set))]
-    fitness_history_gp = [[] for _ in range(len(genetic_schemes_set))]
+    history_quality_gp = [[] for _ in range(len(labels))]
+    inds_history_gp = [[] for _ in range(len(labels))]
+    fitness_history_gp = [[] for _ in range(len(labels))]
     pareto_fronts_metrics = []
     n = 0
     while time_amount <= max_amount_of_time:
@@ -132,6 +133,12 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                 fitness_history_gp[type_num].append(historical_fit)
                 inds_history_gp[type_num].append(composer.history.individuals)
 
+                if type(metric) is list:
+                    roc_auc_metrics = calculated_metrics[0]
+                    complexity_metrics = calculated_metrics[1]
+                else:
+                    roc_auc_metrics = calculated_metrics
+
                 if visualize_pareto:
                     archive_len = len(composer.history.archive_history)
                     pareto_front = composer.history.archive_history[archive_len - 1]
@@ -139,12 +146,6 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                     complexity_list = [ind.fitness.values[1] for ind in pareto_front]
 
                     pareto_fronts_metrics.append([roc_auc_list, complexity_list])
-
-                if type(metric) is list:
-                    roc_auc_metrics = calculated_metrics[0]
-                    complexity_metrics = calculated_metrics[1]
-                else:
-                    roc_auc_metrics = calculated_metrics
 
                 if type(metric) is list:
                     historical_quality = [
@@ -188,7 +189,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
             pareto_metrics = pareto_fronts_metrics
         else:
             pareto_metrics = [pareto_fronts_metrics[i] for i in range(0, len(pareto_fronts_metrics), runs)]
-        viz_pareto_fronts_comparison(pareto_metrics, labels=labels, name_of_dataset=name_of_dataset)
+        viz_pareto_fronts_comparison(pareto_metrics, labels=labels, name_of_dataset=name_of_dataset,
+                                     objectives_names=objectives_names)
         try:
             path_to_save_pareto = name_of_dataset + '_pareto_set_gp'
             np.save(path_to_save_pareto, pareto_metrics)
@@ -201,8 +203,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
             for run_num, run_history in enumerate(exp_history):
                 all_objectives = ComposerVisualiser.objectives_transform(run_history, objectives_numbers=(0, 1),
                                                                          transform_from_minimization=False)
-                max_qual.append(max(all_objectives[0]) + 0.01)
-                max_compl.append(max(all_objectives[1]) + 0.01)
+                max_qual.append(max(all_objectives[0]) + 0.0001)
+                max_compl.append(max(all_objectives[1]) + 0.0001)
             exps_ref_points.append((max(max_qual), max(max_compl)))
 
         hv_set = []
@@ -236,10 +238,11 @@ def exp_self_config_vs_fix_params(train_path: str,
     multi_obj_sel = [SelectionTypesEnum.nsga2, SelectionTypesEnum.spea2]
     selection_types = [multi_obj_sel for _ in range(len(labels))]
     depth_config_option = [False, True, False, True]  # depth configuration option (Active/No active)
-    run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=4,
+    objectives_names = ('ROC-AUC metric', 'Computation time')
+    run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=3,
                       metrics=metrics, selection_types=selection_types, depth_config=depth_config_option,
-                      train_path=train_path, test_path=test_path, name_of_dataset=name_of_dataset,
-                      visualize_pareto=True, visualize_hv=True)
+                      visualize_pareto=True, visualize_hv=True, objectives_names=objectives_names,
+                      train_path=train_path, test_path=test_path, name_of_dataset=name_of_dataset)
 
 
 def exp_single_vs_multi_objective(train_path: str,
@@ -292,7 +295,12 @@ def exp_complexity_metrics(train_path: str,
 
 
 if __name__ == '__main__':
+    file_path_train = 'test_cases/scoring/data/scoring_train.csv'
+    full_path_train = os.path.join(str(proj_root()), file_path_train)
+    file_path_test = 'test_cases/scoring/data/scoring_test.csv'
+    full_path_test = os.path.join(str(proj_root()), file_path_test)
+
     # exp_single_vs_multi_objective()
-    exp_self_config_vs_fix_params()
+    exp_self_config_vs_fix_params(train_path=full_path_train, test_path=full_path_test, name_of_dataset='scoring')
     # exp_multi_obj_selections()
     # exp_complexity_metrics()
