@@ -49,7 +49,7 @@ def save_composer_history(experiment_path: str,
 
 
 def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, genetic_schemes_set=None,
-                      depth_config=None, iterations=20,
+                      depth_config=None, iterations=30,
                       runs=1, pop_sizes=(20, 20, 20, 20), crossover_types=None, metrics=None, mutation_types=None,
                       regular_type=RegularizationTypesEnum.decremental, train_path=None, test_path=None,
                       name_of_dataset=None, visualize_pareto=False, visualize_hv=False,
@@ -112,11 +112,11 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                 is_regular = regular_type == RegularizationTypesEnum.decremental
 
                 try:
-                    tmp_folder = str(run) + '_experiment'
+                    tmp_folder = str(run + 1) + '_experiment'
                     experiment_path = f'D:\результаты экспериментов\{name_of_dataset}\{tmp_folder}'
                     if not os.path.isdir(experiment_path):
                         os.makedirs(experiment_path)
-                    name_of_experiment = name_of_dataset + '_' + labels[type_num] + '_run_number_' + str(run)
+                    name_of_experiment = name_of_dataset + '_' + labels[type_num] + '_run_number_' + str(run + 1)
                     save_composer_history(experiment_path, name_of_experiment, calculated_metrics, chains, composer)
                 except Exception as ex:
                     print(ex)
