@@ -34,27 +34,6 @@ def viz_pareto_fronts_by_iteration(fronts, labels, objectives_order=(1, 0),
     plt.show()
 
 
-def plox_boxplot(self, df: pd.DataFrame):
-    plt.figure(figsize=(8, 6))
-    sns.boxplot(x="exp_number", y="AUC", data=df, color="seagreen")
-    plt.title('ROC-AUC metric for each genetic scheme')
-    plt.ylabel('ROC-AUC value')
-    plt.xlabel('genetic scheme')
-    plt.show()
-    plt.figure(figsize=(8, 6))
-    sns.boxplot(x="exp_number", y="complexity", data=df, color="seagreen")
-    plt.title('Complexity metric for each genetic scheme')
-    plt.ylabel('Complexity value')
-    plt.xlabel('genetic scheme')
-    plt.show()
-    plt.figure(figsize=(8, 6))
-    sns.boxplot(x="exp_number", y="n_models", data=df, color="seagreen")
-    plt.title('Number of models c for each genetic scheme')
-    plt.ylabel('Number of models')
-    plt.xlabel('genetic scheme')
-    plt.show()
-
-
 class PMLB_report():
 
     def __init__(self,
@@ -81,7 +60,8 @@ class PMLB_report():
             for label in self.labels:
                 composer_list = []
                 for i in range(self.runs):
-                    path = f'D:\результаты экспериментов\{name_of_dataset}\{number_of_experiment}\{label}\{name_of_dataset}_{label}_run_number_{i}_composer_history.npy'
+                    tmp_folder = str(i + 1) + '_experiment'
+                    path = f'D:\результаты экспериментов\{name_of_dataset}\{tmp_folder}\{name_of_dataset}_{label}_run_number_{i+1}_composer_history.npy'
                     massive = np.load(path, allow_pickle=True)
                     composer = massive[0]
                     composer_list.append(composer)
@@ -131,10 +111,10 @@ if __name__ == '__main__':
                        ['nsga selection', 'spea2 selection']}
     runs = 4
     datasets = ['churn', 'dis']
-    number_of_experiment = '2_experiment'
+    number_of_experiment = '3_experiment'
     labels = labels_dict['2_experiment']
     report_model = PMLB_report(labels=labels,
                                runs=runs,
                                datasets=datasets)
-    datasets = report_model.choose_clf_datasets()
+    #datasets = report_model.choose_clf_datasets()
     report_model.get_experiment_report(number_of_experiment)
