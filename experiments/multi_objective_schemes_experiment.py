@@ -207,7 +207,7 @@ def exp_self_config_vs_fix_params(train_path: str,
     genetic_schemes_set = [GeneticSchemeTypesEnum.parameter_free, GeneticSchemeTypesEnum.parameter_free,
                            GeneticSchemeTypesEnum.steady_state, GeneticSchemeTypesEnum.steady_state]
     metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
-    multi_obj_sel = [SelectionTypesEnum.nsga2, SelectionTypesEnum.spea2]
+    multi_obj_sel = [SelectionTypesEnum.spea2]
     selection_types = [multi_obj_sel for _ in range(len(labels))]
     depth_config_option = [False, True, False, True]  # depth configuration option (Active/No active)
     objectives_names = ('ROC-AUC metric', 'Computation time')
@@ -227,7 +227,7 @@ def exp_single_vs_multi_objective(train_path: str,
     metrics = [ClassificationMetricsEnum.ROCAUC, ClassificationMetricsEnum.ROCAUC_penalty,
                [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time]]
     single_obj_sel = [SelectionTypesEnum.tournament]
-    multi_obj_sel = [SelectionTypesEnum.nsga2, SelectionTypesEnum.spea2]
+    multi_obj_sel = [SelectionTypesEnum.spea2]
     selection_types = [single_obj_sel, single_obj_sel, multi_obj_sel]
     depth_config_option = [False, False, False, False]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=runs,
@@ -258,7 +258,7 @@ def exp_complexity_metrics(train_path: str,
     genetic_schemes_set = [GeneticSchemeTypesEnum.steady_state, GeneticSchemeTypesEnum.steady_state]
     metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time],
                [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.structural]]
-    multi_obj_sel = [SelectionTypesEnum.nsga2, SelectionTypesEnum.spea2]
+    multi_obj_sel = [SelectionTypesEnum.spea2]
     selection_types = [multi_obj_sel, multi_obj_sel]
     depth_config_option = [False, False]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=4,
