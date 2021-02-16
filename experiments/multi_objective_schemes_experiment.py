@@ -4,10 +4,8 @@ import os
 
 import numpy as np
 from pathlib import Path
-import seaborn as sns
-from pygmo import hypervolume
 from experiments.credit_scoring_experiment import run_credit_scoring_problem
-from experiments.viz import show_history_optimization_comparison
+from experiments.viz import viz_hv_comparison
 
 from fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
 from fedot.core.composer.optimisers.gp_optimiser import GPChainOptimiserParameters
@@ -15,7 +13,6 @@ from fedot.core.composer.optimisers.inheritance import GeneticSchemeTypesEnum
 from fedot.core.composer.optimisers.mutation import MutationTypesEnum
 from fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
 from fedot.core.composer.optimisers.selection import SelectionTypesEnum
-from fedot.core.composer.visualisation import ComposerVisualiser
 from fedot.core.repository.quality_metrics_repository import ClassificationMetricsEnum, ComplexityMetricsEnum, \
     MetricsRepository
 from experiments.gp_schemes_experiment import write_header_to_csv, add_result_to_csv, \
@@ -58,7 +55,7 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
     step = 800
     full_path_train = train_path
     full_path_test = test_path
-    file_path_result = name_of_dataset + '_multiobj_exp_all.csv'
+    all_history = [[] for _ in range(len(labels))]
     file_path_best = name_of_dataset + '_multiobj_exp_best.csv'
     row = ['exp_number', 'exp_type', 'iteration', 'complexity', 't_opt', 'regular', 'AUC', 'n_models', 'n_layers']
     write_header_to_csv(file_path_best, row=row)
@@ -110,7 +107,7 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                                                                                   metrics=metric)
 
                 is_regular = regular_type == RegularizationTypesEnum.decremental
-
+                all_history[type_num].append(composer)
                 try:
                     tmp_folder = str(run + 1) + '_experiment'
                     experiment_path = f'D:\результаты экспериментов\{name_of_dataset}\{tmp_folder}'
@@ -168,16 +165,16 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                                       len(chains[i].nodes),
                                       chains[i].depth, exp_type=labels[type_num], iteration=run,
                                       complexity=compl, exp_number=type_num)
-                    try:
-                        experiment_path = f'D:\результаты экспериментов\{name_of_dataset}'
-                        if not os.path.isdir(experiment_path):
-                            os.makedirs(experiment_path)
-                        name_of_experiment = name_of_dataset + '_' + labels[type_num] + '_run_number_' + str(run)
-                        save_composer_history(experiment_path, name_of_experiment, history_quality_gp, inds_history_gp,
-                                              fitness_history_gp, history_save_flag=True)
+                try:
+                    experiment_path = f'D:\результаты экспериментов\{name_of_dataset}'
+                    if not os.path.isdir(experiment_path):
+                        os.makedirs(experiment_path)
+                    name_of_experiment = name_of_dataset + '_' + labels[type_num] + '_run_number_' + str(run)
+                    save_composer_history(experiment_path, name_of_experiment, history_quality_gp, inds_history_gp,
+                                          fitness_history_gp, history_save_flag=True)
 
-                    except Exception as ex:
-                        print(ex)
+                except Exception as ex:
+                    print(ex)
 
         time_amount += step
 
@@ -197,33 +194,8 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
         except Exception as ex:
             print(ex)
     if visualize_hv:
-        exps_ref_points = []
-        for exp_num, exp_history in enumerate(inds_history_gp):
-            max_qual, max_compl = [], []
-            for run_num, run_history in enumerate(exp_history):
-                all_objectives = ComposerVisualiser.objectives_transform(run_history, objectives_numbers=(0, 1),
-                                                                         transform_from_minimization=False)
-                max_qual.append(max(all_objectives[0]) + 0.0001)
-                max_compl.append(max(all_objectives[1]) + 0.0001)
-            exps_ref_points.append((max(max_qual), max(max_compl)))
-
-        hv_set = []
-        for exp_num, exp_history in enumerate(inds_history_gp):
-            hv_set.append([])
-            for run_num, run_history in enumerate(exp_history):
-                ref = exps_ref_points[exp_num]
-                hv_set[exp_num].append([hypervolume(pop).compute(ref) for pop in fitness_history_gp[exp_num][run_num]])
-
-        color_pallete = sns.color_palette('Dark2')
-        show_history_optimization_comparison(optimisers_fitness_history=hv_set,
-                                             iterations=[_ for _ in range(iterations)],
-                                             labels=labels, color_pallete=color_pallete, ylabel='Hypervolume',
-                                             name_of_dataset=name_of_dataset)
-        try:
-            path_to_save_hv = name_of_dataset + '_hv_set_gp'
-            np.save(path_to_save_hv, hv_set)
-        except Exception as ex:
-            print(ex)
+        viz_hv_comparison(labels=labels, all_history_report=all_history, name_of_dataset=name_of_dataset,
+                          iterations=iterations)
 
 
 def exp_self_config_vs_fix_params(train_path: str,

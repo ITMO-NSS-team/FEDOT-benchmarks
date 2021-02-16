@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import itertools
 import seaborn as sns
 
 from itertools import cycle
-from typing import List
+from typing import List, Any, Tuple
+from pygmo import hypervolume
 
 
 def fitness_by_generations_boxplots(history_runs, iterations, name_of_dataset=None, save=True):
@@ -56,7 +58,7 @@ def show_fitness_history_all(history_runs, iterations, name_of_dataset=None, wit
 
 def show_history_optimization_comparison(optimisers_fitness_history: List[List[int]], iterations: List[int],
                                          labels: List[str], color_pallete: str = 'bgrcmykw', xlabel='Generation, #',
-                                         ylabel='Best fitness',name_of_dataset=None, save=True):
+                                         ylabel='Best fitness', name_of_dataset=None, save=True):
     color_to_take = cycle(color_pallete)
     plt.yticks(fontsize=12)
     for fitness_history in optimisers_fitness_history:
@@ -72,14 +74,25 @@ def show_history_optimization_comparison(optimisers_fitness_history: List[List[i
             os.mkdir('../../tmp')
 
         if ylabel == 'Hypervolume':
-            file_name = name_of_dataset+'_Hypervolume_comparison.png'
+            file_name = name_of_dataset + '_Hypervolume_comparison.png'
         else:
-            file_name = name_of_dataset+'_history_optimization_comparison.png'
+            file_name = name_of_dataset + '_history_optimization_comparison.png'
         path = f'../../tmp/{file_name}'
         plt.savefig(path, bbox_inches='tight')
 
     plt.show()
 
+def objectives_transform(individuals: List[List[Any]], objectives_numbers: Tuple[int] = None,
+                         transform_from_minimization=True):
+    objectives_numbers = [i for i in range(
+        len(individuals[0][0].fitness.values))] if not objectives_numbers else objectives_numbers
+    all_inds = list(itertools.chain(*individuals))
+    all_objectives = [[ind.fitness.values[i] for ind in all_inds] for i in objectives_numbers]
+    if transform_from_minimization:
+        all_objectives = list(
+            map(lambda obj_values: obj_values if obj_values[0] > 0 else list(1 + np.array(obj_values)),
+                all_objectives))
+    return all_objectives
 
 def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
                                  objectives_names=('ROC-AUC penalty metric', 'Computation time'),
@@ -107,3 +120,44 @@ def viz_pareto_fronts_comparison(fronts, labels, objectives_order=(1, 0),
         plt.savefig(path, bbox_inches='tight')
 
     plt.show()
+
+
+def viz_hv_comparison(labels, iterations, all_history_report, name_of_dataset='None',
+                      color_pallete=sns.color_palette('Dark2')):
+    all_history_report_transformed = [
+        [[front.items for front in comp_run.history.archive_history] for comp_run in hist] for hist in
+        all_history_report]
+    fitness_history_gp = [[[[[1 + it.fitness.values[0], it.fitness.values[1]] for it in front.items] for front in
+                            comp_run.history.archive_history] for comp_run in hist] for hist in all_history_report]
+
+    inds_history_gp = all_history_report_transformed
+
+    ref = [[], []]
+    for exp_history in inds_history_gp:
+        max_qual, max_compl = [], []
+        for run_history in exp_history:
+            all_objectives = objectives_transform(run_history, objectives_numbers=(0, 1),
+                                                                     transform_from_minimization=True)
+            max_qual.append(max(all_objectives[0]) + 0.0001)
+            max_compl.append(max(all_objectives[1]) + 0.0001)
+        ref[0].append(max(max_qual))
+        ref[1].append(max(max_compl))
+    ref_point = (max(ref[0]), max(ref[1]))
+
+    hv_set = []
+    for exp_num, exp_history in enumerate(fitness_history_gp):
+        hv_set.append([])
+        for run_num, run_history in enumerate(exp_history):
+            hv_set[exp_num].append(
+                [hypervolume(pop).compute(ref_point) for pop in fitness_history_gp[exp_num][run_num]])
+
+    show_history_optimization_comparison(optimisers_fitness_history=hv_set,
+                                         iterations=[_ for _ in range(iterations)],
+                                         labels=labels, color_pallete=color_pallete, ylabel='Hypervolume',
+                                         name_of_dataset=name_of_dataset)
+
+    try:
+        path_to_save_hv = name_of_dataset + '_hv_set_gp'
+        np.save(path_to_save_hv, hv_set)
+    except Exception as ex:
+        print(ex)

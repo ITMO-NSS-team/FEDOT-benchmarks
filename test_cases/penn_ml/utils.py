@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import seaborn as sns
+from experiments.viz import viz_hv_comparison
 
 
 def viz_pareto_fronts_by_iteration(fronts, labels, objectives_order=(1, 0),
@@ -55,19 +56,21 @@ class PMLB_report():
         df = pd.read_csv(path, names=names, sep=',')
         return df
 
-    def get_experiment_report(self, number_of_experiment: str):
+    def get_experiment_report(self):
+        composers = []
         for name_of_dataset in self.datasets:
             for label in self.labels:
                 composer_list = []
                 for i in range(self.runs):
                     tmp_folder = str(i + 1) + '_experiment'
-                    path = f'D:\результаты экспериментов\{name_of_dataset}\{tmp_folder}\{name_of_dataset}_{label}_run_number_{i+1}_composer_history.npy'
+                    path = f'D:\результаты экспериментов\{name_of_dataset}\{tmp_folder}\{name_of_dataset}_{label}_run_number_{i + 1}_composer_history.npy'
                     massive = np.load(path, allow_pickle=True)
                     composer = massive[0]
                     composer_list.append(composer)
 
                 self.viz_pareto(composer_list, name_of_dataset, self.runs, label)
-        return composer_list
+                composers.append(composer_list)
+        return composers
 
     def viz_pareto(self,
                    composer_list: list,
@@ -100,6 +103,12 @@ class PMLB_report():
 
         viz_pareto_fronts_by_iteration(pareto_history, labels=runs, name_of_dataset=name_of_dataset + "_" + label)
 
+    def viz_hv(self, iterations: int, color_pallete=sns.color_palette('Dark2'), name_of_dataset='None'):
+        all_history_report = self.get_experiment_report()
+
+        viz_hv_comparison(labels=self.labels, all_history_report=all_history_report, name_of_dataset=name_of_dataset,
+                          color_pallete=color_pallete, iterations=iterations)
+
 
 if __name__ == '__main__':
     labels_dict = {'1_experiment':
@@ -116,5 +125,5 @@ if __name__ == '__main__':
     report_model = PMLB_report(labels=labels,
                                runs=runs,
                                datasets=datasets)
-    #datasets = report_model.choose_clf_datasets()
-    report_model.get_experiment_report(number_of_experiment)
+    # datasets = report_model.choose_clf_datasets()
+    report_model.get_experiment_report()
