@@ -2,13 +2,12 @@ import gc
 import json
 import os
 from glob import glob
+from pathlib import Path
 from typing import Tuple
 
 import pandas as pd
-from pmlb import fetch_data
-from pathlib import Path
-
 from fedot.core.utils import save_file_to_csv, split_data
+from pmlb import fetch_data
 
 
 def project_root() -> Path:
@@ -66,7 +65,8 @@ def convert_json_stats_to_csv(dataset: list, include_hyper: bool = True):
     list_of_df = []
     new_col = []
     dataset_name_column_place = 1
-    for filename, name_of_dataset in zip(glob('*.json'), dataset):
+    for name_of_dataset in dataset:
+        filename = f'penn_ml_metrics_for_{name_of_dataset}.json'
         with open(filename, 'r') as f:
             data = json.load(f)
             df = pd.json_normalize(data)
@@ -91,7 +91,7 @@ def save_metrics_result_file(data: dict, file_name: str):
         json.dump(data, file, indent=4)
 
 
-def get_models_hyperparameters(timedelta: int = 15) -> dict:
+def get_models_hyperparameters(timedelta: int = 30) -> dict:
     # MAX_RUNTIME_MINS should be equivalent to MAX_RUNTIME_SECS
 
     tpot_config = {'MAX_RUNTIME_MINS': timedelta,
