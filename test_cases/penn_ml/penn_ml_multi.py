@@ -1,8 +1,7 @@
-import pandas as pd
 from pmlb import classification_dataset_names, fetch_data, regression_dataset_names
 from pmlb.update_dataset_files import compute_imbalance
 from benchmark_utils import get_penn_case_data_paths
-from FEDOT.fedot.core.repository.tasks import TaskTypesEnum
+from fedot.core.repository.tasks import TaskTypesEnum
 import experiments.multi_objective_schemes_experiment as multi_model
 
 

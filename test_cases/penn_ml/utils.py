@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import seaborn as sns
-from experiments.viz import viz_hv_comparison
+from experiments.viz import viz_hv_comparison, viz_pareto_fronts_comparison
+from experiments.gp_operators_experiment import results_preprocess_and_quality_visualisation
+from fedot.core.composer.optimisers.multi_objective_fitness import MultiObjFitness
 
 
 def viz_pareto_fronts_by_iteration(fronts, labels, objectives_order=(1, 0),
@@ -103,12 +105,46 @@ class PMLB_report():
 
         viz_pareto_fronts_by_iteration(pareto_history, labels=runs, name_of_dataset=name_of_dataset + "_" + label)
 
+    def viz_pareto_comparison(self, pareto_run_numbers=(1, 1, 1, 1), name_of_dataset='None'):
+        all_history_report = self.get_experiment_report()
+        selected_composers = [all_history_report[exp_num][front_num] for exp_num, front_num in
+                              enumerate(pareto_run_numbers)]
+        pareto_fronts_metrics = []
+        for composer in selected_composers:
+            archive_len = len(composer.history.archive_history)
+            pareto_front = composer.history.archive_history[archive_len - 1]
+            roc_auc_list = [-ind.fitness.values[0] for ind in pareto_front]
+            complexity_list = [ind.fitness.values[1] for ind in pareto_front]
+            pareto_fronts_metrics.append([roc_auc_list, complexity_list])
+
+        objectives_names = ('ROC-AUC metric', 'Computation time')
+        viz_pareto_fronts_comparison(pareto_fronts_metrics, labels=self.labels, name_of_dataset=name_of_dataset,
+                                     objectives_names=objectives_names)
+
     def viz_hv(self, iterations: int, color_pallete=sns.color_palette('Dark2'), name_of_dataset='None'):
         all_history_report = self.get_experiment_report()
 
         viz_hv_comparison(labels=self.labels, all_history_report=all_history_report, name_of_dataset=name_of_dataset,
                           color_pallete=color_pallete, iterations=iterations)
 
+    def viz_best_quality_comparison(self, iterations, name_of_dataset='None'):
+        all_history_report = self.get_experiment_report()
+        history_quality_gp = [[] for _ in range(len(self.labels))]
+        for exp_num, exp in enumerate(all_history_report):
+            for comp_num, composer in enumerate(exp):
+                if type(all_history_report[exp_num][comp_num].history.archive_history[
+                            0][0].fitness) is MultiObjFitness:
+                    historical_quality = [
+                        [-chain.fitness.values[0] for chain in pop] + [-chain.fitness.values[0] for chain in
+                                                                       composer.history.archive_history[i]] for i, pop
+                        in enumerate(composer.history.individuals)]
+                    history_quality_gp[exp_num].append(historical_quality)
+
+                else:
+                    historical_quality = [[-chain.fitness for chain in pop] for pop in composer.history.individuals]
+                    history_quality_gp[exp_num].append(historical_quality)
+        results_preprocess_and_quality_visualisation(history_gp=history_quality_gp, labels=self.labels,
+                                                     iterations=iterations, name_of_dataset=name_of_dataset)
 
 if __name__ == '__main__':
     labels_dict = {'1_experiment':
