@@ -14,7 +14,7 @@ from fedot.core.composer.optimisers.mutation import MutationTypesEnum
 from fedot.core.composer.optimisers.regularization import RegularizationTypesEnum
 from fedot.core.composer.optimisers.selection import SelectionTypesEnum
 from fedot.core.repository.quality_metrics_repository import ClassificationMetricsEnum, ComplexityMetricsEnum, \
-    MetricsRepository
+    MetricsRepository, RegressionMetricsEnum
 from experiments.gp_schemes_experiment import write_header_to_csv, add_result_to_csv, \
     results_preprocess_and_quality_visualisation
 from experiments.viz import viz_pareto_fronts_comparison
@@ -61,7 +61,7 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
     write_header_to_csv(file_path_best, row=row)
     time_amount = step
     if not metrics:
-        metrics = [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time]
+        metrics = [RegressionMetricsEnum.RMSE.ROCAUC, ComplexityMetricsEnum.computation_time]
     max_depths = [3, 3, 3, 3]
     start_depth = [2, 2, 2, 2]  # starting depth for 1st population initialization
     history_quality_gp = [[] for _ in range(len(labels))]
@@ -206,7 +206,7 @@ def exp_self_config_vs_fix_params(train_path: str,
               'steady-state with depth config']
     genetic_schemes_set = [GeneticSchemeTypesEnum.parameter_free, GeneticSchemeTypesEnum.parameter_free,
                            GeneticSchemeTypesEnum.steady_state, GeneticSchemeTypesEnum.steady_state]
-    metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
+    metrics = [[RegressionMetricsEnum.RMSE, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
     multi_obj_sel = [SelectionTypesEnum.spea2]
     selection_types = [multi_obj_sel for _ in range(len(labels))]
     depth_config_option = [False, True, False, True]  # depth configuration option (Active/No active)
@@ -224,8 +224,8 @@ def exp_single_vs_multi_objective(train_path: str,
     labels = ['steady_state single-obj', 'steady_state single-obj penalty', 'steady-state multi-obj']
     runs = 4
     genetic_schemes_set = [GeneticSchemeTypesEnum.steady_state for _ in range(len(labels))]
-    metrics = [ClassificationMetricsEnum.ROCAUC, ClassificationMetricsEnum.ROCAUC_penalty,
-               [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time]]
+    metrics = [RegressionMetricsEnum.RMSE, RegressionMetricsEnum.RMSE_penalty,
+               [RegressionMetricsEnum.RMSE, ComplexityMetricsEnum.computation_time]]
     single_obj_sel = [SelectionTypesEnum.tournament]
     multi_obj_sel = [SelectionTypesEnum.spea2]
     selection_types = [single_obj_sel, single_obj_sel, multi_obj_sel]
@@ -241,7 +241,7 @@ def exp_multi_obj_selections(train_path: str,
     history_file = name_of_dataset + '_history_selfconf_vs_fixparams.csv'
     labels = ['nsga selection', 'spea2 selection']
     genetic_schemes_set = [GeneticSchemeTypesEnum.parameter_free, GeneticSchemeTypesEnum.parameter_free]
-    metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
+    metrics = [[RegressionMetricsEnum.RMSE.ROCAUC, ComplexityMetricsEnum.computation_time] for _ in range(len(labels))]
     selection_types = [[SelectionTypesEnum.nsga2], [SelectionTypesEnum.spea2]]
     depth_config_option = [False, False]  # depth configuration option (Active/No active)
     run_multi_obj_exp(history_file=history_file, labels=labels, genetic_schemes_set=genetic_schemes_set, runs=4,
@@ -256,8 +256,8 @@ def exp_complexity_metrics(train_path: str,
     history_file = name_of_dataset + '_history_selfconf_vs_fixparams.csv'
     labels = ['computation time', 'structural complexity']
     genetic_schemes_set = [GeneticSchemeTypesEnum.steady_state, GeneticSchemeTypesEnum.steady_state]
-    metrics = [[ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.computation_time],
-               [ClassificationMetricsEnum.ROCAUC, ComplexityMetricsEnum.structural]]
+    metrics = [[RegressionMetricsEnum.RMSE, ComplexityMetricsEnum.computation_time],
+               [RegressionMetricsEnum.RMSE, ComplexityMetricsEnum.structural]]
     multi_obj_sel = [SelectionTypesEnum.spea2]
     selection_types = [multi_obj_sel, multi_obj_sel]
     depth_config_option = [False, False]  # depth configuration option (Active/No active)

@@ -36,7 +36,7 @@ def run_credit_scoring_problem(train_file_path, test_file_path,
                                gp_optimiser_params: Optional[GPChainOptimiserParameters] = None, pop_size=None,
                                generations=None, max_depth=3, metrics=ClassificationMetricsEnum.ROCAUC_penalty,
                                start_depth: int = 3):
-    task = Task(TaskTypesEnum.classification)
+    task = Task(TaskTypesEnum.regression)
     dataset_to_compose = InputData.from_csv(train_file_path, task=task)
     dataset_to_validate = InputData.from_csv(test_file_path, task=task)
 
