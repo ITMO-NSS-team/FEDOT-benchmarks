@@ -17,7 +17,7 @@ def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
 
 
 if __name__ == '__main__':
-    dataset = ['1203_BNG_pwLinear', '4544_GeographicalOriginalofMusic', '537_houses']
+    dataset = ['4544_GeographicalOriginalofMusic', '537_houses']
     number_of_experiment = 1
     for name_of_dataset in dataset:
         try:

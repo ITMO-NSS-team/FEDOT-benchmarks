@@ -3,8 +3,6 @@ import random
 from typing import Optional
 
 import numpy as np
-from sklearn.metrics import roc_auc_score as roc_auc
-
 from fedot.core.chains.chain import Chain
 from fedot.core.composer.gp_composer.gp_composer import GPComposerBuilder, GPComposerRequirements
 from fedot.core.composer.optimisers.crossover import CrossoverTypesEnum
@@ -17,6 +15,7 @@ from fedot.core.repository.model_types_repository import ModelTypesRepository
 from fedot.core.repository.quality_metrics_repository import \
     (ClassificationMetricsEnum, MetricsRepository)
 from fedot.core.repository.tasks import TaskTypesEnum, Task
+from sklearn.metrics import mean_squared_error
 
 random.seed(1)
 np.random.seed(1)
@@ -26,8 +25,8 @@ def calculate_validation_metric(chain: Chain, dataset_to_validate: InputData) ->
     # the execution of the obtained composite models
     predicted = chain.predict(dataset_to_validate)
     # the quality assessment for the simulation results
-    roc_auc_value = roc_auc(y_true=dataset_to_validate.target,
-                            y_score=predicted.predict)
+    roc_auc_value = mean_squared_error(y_true=dataset_to_validate.target,
+                                       y_pred=predicted.predict, squared=False)
     return roc_auc_value
 
 
