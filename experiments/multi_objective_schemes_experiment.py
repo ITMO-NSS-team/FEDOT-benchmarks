@@ -139,20 +139,20 @@ def run_multi_obj_exp(selection_types, history_file='history.csv', labels=None, 
                 if visualize_pareto:
                     archive_len = len(composer.history.archive_history)
                     pareto_front = composer.history.archive_history[archive_len - 1]
-                    roc_auc_list = [-ind.fitness.values[0] for ind in pareto_front]
+                    roc_auc_list = [ind.fitness.values[0] for ind in pareto_front]
                     complexity_list = [ind.fitness.values[1] for ind in pareto_front]
 
                     pareto_fronts_metrics.append([roc_auc_list, complexity_list])
 
                 if type(metric) is list:
                     historical_quality = [
-                        [-chain.fitness.values[0] for chain in pop] + [-chain.fitness.values[0] for chain in
+                        [chain.fitness.values[0] for chain in pop] + [chain.fitness.values[0] for chain in
                                                                        composer.history.archive_history[i]] for i, pop
                         in enumerate(composer.history.individuals)]
                     history_quality_gp[type_num].append(historical_quality)
 
                 else:
-                    historical_quality = [[-chain.fitness for chain in pop] for pop in composer.history.individuals]
+                    historical_quality = [[chain.fitness for chain in pop] for pop in composer.history.individuals]
                     history_quality_gp[type_num].append(historical_quality)
 
                 for i, roc_auc in enumerate(roc_auc_metrics):
