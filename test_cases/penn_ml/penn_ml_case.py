@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 from pmlb import classification_dataset_names, fetch_data, regression_dataset_names
-from pmlb.support_funcs import compute_imbalance
+from pmlb.update_dataset_files import compute_imbalance
 
 from benchmark_model_types import BenchmarkModelTypesEnum
 from benchmark_utils import \
