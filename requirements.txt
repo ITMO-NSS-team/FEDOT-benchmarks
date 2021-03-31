@@ -14,6 +14,6 @@ networkx==2.2
 matplotlib==3.0.3
 joblib==0.14.1
 seaborn==0.9.0
-fedot~=0.1.3
+fedot~=0.2.1
 setuptools~=50.3.2
 pygmo==2.13.0

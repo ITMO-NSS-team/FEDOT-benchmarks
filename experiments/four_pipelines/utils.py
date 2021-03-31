@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 from FEDOT.fedot.api.main import Fedot
 from pmlb import classification_dataset_names, regression_dataset_names
 from benchmark_utils import save_metrics_result_file
@@ -8,6 +9,24 @@ from model.tpot.b_tpot import run_tpot
 from baseline.b_xgboost import run_xgboost
 from sklearn.metrics import f1_score, mean_squared_error, roc_auc_score, balanced_accuracy_score, mean_absolute_error
 
+
+def create_report_dataframe(type_of_task, name_of_pipeline, name_of_dataset, num_of_experiments):
+    tmp_lst = []
+
+    for run_num in range(num_of_experiments):
+        path = f'D:\saved_results\{type_of_task}\{name_of_pipeline}\{name_of_dataset}\{run_num + 1}_experiment\{name_of_dataset}_run_number_{run_num + 1}_best_metric.json'
+        df = pd.read_json(path, orient='records')
+        df['name_of_experiment'] = name_of_dataset
+        df = df.reset_index()
+        df.rename(columns={'index': 'name_of_metric'}, inplace=True)
+        tmp_lst.append(df)
+    df_all = pd.concat(tmp_lst)
+    df_all = df_all.groupby(by=['name_of_metric']).mean()
+    df_all = df_all.reset_index()
+    df_all.rename(columns={'index': 'name_of_metric'}, inplace=True)
+    df_all['name_of_experiment'] = name_of_dataset
+    df_all['type_of_pipeline'] = name_of_pipeline
+    return df_all
 
 
 def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
@@ -82,7 +101,7 @@ def Fedot_model(train_path,
     params = {'max_depth': 4,
               'max_arity': 2}
 
-    baseline_model = Fedot(problem=task, learning_time=time_for_exp,preset='without_knn', composer_params=params)
+    baseline_model = Fedot(problem=task, learning_time=time_for_exp, preset='without_knn', composer_params=params)
     baseline_model.fit(features=train_path, target='target')
     predicted_labels = baseline_model.predict(features=test_path, save_predictions=True)
     predicted = baseline_model.get_metrics(metric_names=metric_names)
@@ -114,11 +133,10 @@ def tpot_model(train_path,
 #
 
 def baseline_model(train_path,
-                test_path,
-                task,
-                metric_names,
-                time_for_exp):
-
-    target, predicted, predicted_labels = run_xgboost()
+                   test_path,
+                   task):
+    target, predicted, predicted_labels = run_xgboost(train_path,
+                                                      test_path,
+                                                      task)
 
     return target, predicted, predicted_labels
