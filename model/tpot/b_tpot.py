@@ -5,7 +5,7 @@ import joblib
 from benchmark_utils import get_models_hyperparameters
 
 from fedot.core.data.data import InputData
-from FEDOT.fedot.core.models.evaluation.automl_eval import fit_tpot, predict_tpot_class, predict_tpot_reg
+from fedot.core.models.evaluation.automl_eval import fit_tpot, predict_tpot_class, predict_tpot_reg
 from fedot.core.repository.tasks import Task, TaskTypesEnum
 
 

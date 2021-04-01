@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from FEDOT.fedot.api.main import Fedot
+from fedot.api.main import Fedot
 from pmlb import classification_dataset_names, regression_dataset_names
 from benchmark_utils import save_metrics_result_file
 from fedot.core.repository.tasks import TaskTypesEnum

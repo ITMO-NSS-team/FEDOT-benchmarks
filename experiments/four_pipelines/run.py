@@ -6,7 +6,7 @@ import numpy as np
 import sys
 sys.setrecursionlimit(10000)
 
-from FEDOT.fedot.core.repository.tasks import TaskTypesEnum, Task
+from fedot.core.repository.tasks import TaskTypesEnum, Task
 from experiments.four_pipelines.utils import create_folder, _problem_and_metric_for_dataset, Fedot_model, \
     tpot_model, baseline_model, calculate_metrics, create_report_dataframe
 
@@ -72,11 +72,10 @@ if __name__ == '__main__':
                     create_folder(run, name_of_method, name_of_dataset, time_for_exp, metric_list)
                 elif name_of_method == 'Baseline':
                     true_target, predicted, predicted_labels = baseline_model(train_path=train_file,
-                                                                          test_path=test_file,
-                                                                          task=task)
+                                                                              test_path=test_file,
+                                                                              task=task)
                     metric_list = calculate_metrics(metric_names, true_target, predicted, predicted_labels)
                     create_folder(run, name_of_method, name_of_dataset, time_for_exp, metric_list)
-
 
         methods = ['FEDOT', 'TPOT', 'Baseline']
         _ = []
@@ -89,9 +88,9 @@ if __name__ == '__main__':
 
     df_all = pd.concat(tmp_lst)
     dff = df_all.pivot_table(
-                    values='metrics',
-                    index=['name_of_metric', 'type_of_pipeline'],
-                    columns='name_of_experiment',
-                    aggfunc=np.mean)
+        values='metrics',
+        index=['name_of_metric', 'type_of_pipeline'],
+        columns='name_of_experiment',
+        aggfunc=np.mean)
     dff.to_csv(f'./{task_type}_pivot_table.csv')
     var = 1
