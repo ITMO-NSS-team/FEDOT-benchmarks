@@ -5,6 +5,8 @@ from fedot.api.main import Fedot
 from pmlb import classification_dataset_names, regression_dataset_names
 from benchmark_utils import save_metrics_result_file
 from fedot.core.repository.tasks import TaskTypesEnum
+
+from model.mlbox.b_mlbox import run_mlbox
 from model.tpot.b_tpot import run_tpot
 from baseline.b_xgboost import run_xgboost
 from sklearn.metrics import f1_score, mean_squared_error, roc_auc_score, balanced_accuracy_score, mean_absolute_error
@@ -40,7 +42,7 @@ def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
         return None, None
 
 
-def calculate_metrics(metric_list: list, target: list, predicted_probs: list, predicted_labels: list):
+def calculate_metrics(metric_list: list, target: list, predicted_probs: list, predicted_labels: list = None, convert_flag:bool = False):
     metric_dict = {'roc_auc': roc_auc_score,
                    'f1': f1_score,
                    'rmse': mean_squared_error,
@@ -52,11 +54,16 @@ def calculate_metrics(metric_list: list, target: list, predicted_probs: list, pr
     for metric_name in metric_list:
         predicted = predicted_probs
         if metric_name in label_only_metrics:
+            predicted_labels = predicted_probs
             predicted = predicted_labels
 
         if metric_name == 'rmse':
             result_metric.append(round(metric_dict[metric_name](target, predicted, squared=False), 3))
         else:
+            if convert_flag:
+                x = 32
+                _ = [round(x) for x in predicted]
+                predicted = _
             result_metric.append(round(metric_dict[metric_name](target, predicted), 3))
 
     result_dict = dict(zip(metric_list, result_metric))
@@ -123,14 +130,17 @@ def tpot_model(train_path,
     return true_target, predicted, predicted_labels
 
 
-#
-# def linear_pipeline_model(train_path,
-#                           test_path,
-#                           name_of_dataset,
-#                           task):
-#     return 1
-#
-#
+def linear_pipeline_model(train_path,
+                          test_path,
+                          name_of_dataset,
+                          task):
+    true_target, predicted = run_mlbox(train_path,
+                                       test_path,
+                                       name_of_dataset,
+                                       task)
+
+    return true_target, predicted
+
 
 def baseline_model(train_path,
                    test_path,

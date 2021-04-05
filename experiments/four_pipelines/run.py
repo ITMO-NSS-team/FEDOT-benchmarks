@@ -3,29 +3,26 @@ from pmlb.update_dataset_files import compute_imbalance
 from benchmark_utils import get_penn_case_data_paths
 import pandas as pd
 import numpy as np
-import sys
-sys.setrecursionlimit(10000)
-
 from fedot.core.repository.tasks import TaskTypesEnum, Task
 from experiments.four_pipelines.utils import create_folder, _problem_and_metric_for_dataset, Fedot_model, \
-    tpot_model, baseline_model, calculate_metrics, create_report_dataframe
+    tpot_model, baseline_model, calculate_metrics, create_report_dataframe, linear_pipeline_model
 
-dataset_dict = {'regression': [#'227_cpu_small',
-                               #'228_elusage',
-                               #'1096_FacultySalaries',
-                               #'605_fri_c2_250_25',
-                               '1027_ESL'],
+dataset_dict = {'regression': ['227_cpu_small',
+    '228_elusage',
+    '1096_FacultySalaries',
+    '605_fri_c2_250_25',
+    '1027_ESL'],
 
-                'classification': ['magic',
-                                   'labor',
-                                   'flare',
-                                   'ionosphere',
-                                   'spect']}
+    'classification': ['magic',
+                       'labor',
+                       'flare',
+                       'ionosphere',
+                       'spect']}
 
 if __name__ == '__main__':
     num_of_experiments = 3
-    time_for_exp = 5
-    report_flag = False
+    time_for_exp = 10
+    report_flag = True
     task_type = 'classification'
     #task_type = 'regression'
     name_of_method = 'FEDOT'
@@ -76,8 +73,14 @@ if __name__ == '__main__':
                                                                               task=task)
                     metric_list = calculate_metrics(metric_names, true_target, predicted, predicted_labels)
                     create_folder(run, name_of_method, name_of_dataset, time_for_exp, metric_list)
-
-        methods = ['FEDOT', 'TPOT', 'Baseline']
+                else:
+                    true_target, predicted = linear_pipeline_model(train_path=train_file,
+                                                                    test_path=test_file,
+                                                                    name_of_dataset=name_of_dataset,
+                                                                    task=task)
+                    metric_list = calculate_metrics(metric_names, true_target, predicted.values,convert_flag=True)
+                    create_folder(run, name_of_method, name_of_dataset, time_for_exp, metric_list)
+        methods = ['FEDOT', 'TPOT', 'Baseline', 'Linear']
         _ = []
         for method in methods:
             report_df = create_report_dataframe(task_type, method, name_of_dataset, num_of_experiments)
@@ -93,4 +96,4 @@ if __name__ == '__main__':
         columns='name_of_experiment',
         aggfunc=np.mean)
     dff.to_csv(f'./{task_type}_pivot_table.csv')
-    var = 1
+
