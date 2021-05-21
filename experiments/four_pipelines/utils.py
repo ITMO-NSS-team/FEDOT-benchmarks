@@ -16,7 +16,7 @@ def create_report_dataframe(type_of_task, name_of_pipeline, name_of_dataset, num
     tmp_lst = []
 
     for run_num in range(num_of_experiments):
-        path = f'D:\saved_results\{type_of_task}\{name_of_pipeline}\{name_of_dataset}\{run_num + 1}_experiment\{name_of_dataset}_run_number_{run_num + 1}_best_metric.json'
+        path = f'./{name_of_pipeline}/{name_of_dataset}/{run_num + 1}_experiment/{name_of_dataset}_run_number_{run_num + 1}_best_metric.json'
         df = pd.read_json(path, orient='records')
         df['name_of_experiment'] = name_of_dataset
         df = df.reset_index()
@@ -31,18 +31,17 @@ def create_report_dataframe(type_of_task, name_of_pipeline, name_of_dataset, num
     return df_all
 
 
-def _problem_and_metric_for_dataset(name_of_dataset: str, num_classes: int):
-    if num_classes == 2 and name_of_dataset in classification_dataset_names:
+def _problem_and_metric_for_dataset(name_of_dataset: str):
+    if name_of_dataset in classification_dataset_names:
         return TaskTypesEnum.classification, ['roc_auc', 'f1']
-    elif num_classes > 2 and name_of_dataset in classification_dataset_names:
-        return TaskTypesEnum.classification, ['balanced_accuracy']
     elif name_of_dataset in regression_dataset_names:
         return TaskTypesEnum.regression, ['rmse', 'mae']
     else:
         return None, None
 
 
-def calculate_metrics(metric_list: list, target: list, predicted_probs: list, predicted_labels: list = None, convert_flag:bool = False):
+def calculate_metrics(metric_list: list, target: list, predicted_probs: list, predicted_labels: list = None,
+                      convert_flag: bool = False):
     metric_dict = {'roc_auc': roc_auc_score,
                    'f1': f1_score,
                    'rmse': mean_squared_error,
@@ -56,12 +55,12 @@ def calculate_metrics(metric_list: list, target: list, predicted_probs: list, pr
         if metric_name in label_only_metrics:
             predicted_labels = predicted_probs
             predicted = predicted_labels
+            convert_flag = True
 
         if metric_name == 'rmse':
             result_metric.append(round(metric_dict[metric_name](target, predicted, squared=False), 3))
         else:
             if convert_flag:
-                x = 32
                 _ = [round(x) for x in predicted]
                 predicted = _
             result_metric.append(round(metric_dict[metric_name](target, predicted), 3))
@@ -91,7 +90,7 @@ def save_model_history(experiment_path: str,
 def create_folder(run, name_of_method, name_of_dataset, time_for_exp, calculated_metrics, model=None):
     try:
         tmp_folder = str(run + 1) + '_experiment'
-        experiment_path = f'D:\saved_results\{name_of_method}\{name_of_dataset}\{tmp_folder}'
+        experiment_path = f'./{name_of_method}/{name_of_dataset}/{tmp_folder}'
         if not os.path.isdir(experiment_path):
             os.makedirs(experiment_path)
         name_of_experiment = name_of_dataset + '_run_number_' + str(run + 1)
@@ -105,8 +104,8 @@ def Fedot_model(train_path,
                 task,
                 metric_names,
                 time_for_exp):
-    params = {'max_depth': 4,
-              'max_arity': 2}
+    params = {'max_depth': 6,
+              'max_arity': 3}
 
     baseline_model = Fedot(problem=task, learning_time=time_for_exp, preset='without_knn', composer_params=params)
     baseline_model.fit(features=train_path, target='target')
@@ -120,12 +119,14 @@ def tpot_model(train_path,
                test_path,
                name_of_dataset,
                task,
-               time_for_exp):
+               time_for_exp,
+               experiment_number):
     true_target, predicted, predicted_labels = run_tpot(train_path,
                                                         test_path,
                                                         name_of_dataset,
                                                         task,
-                                                        time_for_exp)
+                                                        time_for_exp,
+                                                        experiment_number)
 
     return true_target, predicted, predicted_labels
 

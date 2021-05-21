@@ -4,23 +4,24 @@ import joblib
 
 from benchmark_utils import get_models_hyperparameters
 
-from fedot.core.data.data import InputData
-from fedot.core.models.evaluation.automl_eval import fit_tpot, predict_tpot_class, predict_tpot_reg
-from fedot.core.repository.tasks import Task, TaskTypesEnum
+from FEDOT.fedot.core.data.data import InputData
+from FEDOT.fedot.core.models.evaluation.automl_eval import fit_tpot, predict_tpot_class, predict_tpot_reg
+from FEDOT.fedot.core.repository.tasks import Task, TaskTypesEnum
 
 
 def run_tpot(train_file_path,
              test_file_path,
              case_label,
              task,
-             time_for_exp):
+             time_for_exp,
+             experiment_number):
     models_hyperparameters = get_models_hyperparameters()['TPOT']
     generations = models_hyperparameters['GENERATIONS']
     population_size = models_hyperparameters['POPULATION_SIZE']
     time_to_eval = time_for_exp
 
     result_model_filename = f'{case_label}_g{generations}' \
-                            f'_p{population_size}_{task.task_type.name}.pkl'
+                            f'_p{population_size}_experiment_num_{experiment_number}_{task.name}.pkl'
     current_file_path = str(os.path.dirname(__file__))
     result_file_path = os.path.join(current_file_path, result_model_filename)
 
@@ -40,10 +41,10 @@ def run_tpot(train_file_path,
 
     predict_data = InputData.from_csv(test_file_path, task=Task(task))
     true_target = predict_data.target
-    if task.task_type == TaskTypesEnum.regression:
+    if task.name == 'regression':
         predicted = predict_tpot_reg(imported_model, predict_data)
         predicted_labels = predicted
-    elif task.task_type == TaskTypesEnum.classification:
+    elif task.name == 'classification':
         predicted, predicted_labels = predict_tpot_class(imported_model, predict_data)
     else:
         print('Incorrect type of ml task')

@@ -96,12 +96,12 @@ def get_models_hyperparameters(timedelta: int = 10) -> dict:
     # MAX_RUNTIME_MINS should be equivalent to MAX_RUNTIME_SECS
 
     tpot_config = {'MAX_RUNTIME_MINS': timedelta,
-                   'GENERATIONS': 100,
+                   'GENERATIONS': 200,
                    'POPULATION_SIZE': 20
                    }
 
     fedot_config = {'MAX_RUNTIME_MINS': timedelta,
-                    'GENERATIONS': 100,
+                    'GENERATIONS': 200,
                     'POPULATION_SIZE': 20
                     }
 
@@ -127,7 +127,7 @@ def get_models_hyperparameters(timedelta: int = 10) -> dict:
 
     }
 
-    mlbox_config = {'space': space_for_mlbox, 'max_evals': 40}
+    mlbox_config = {'space': space_for_mlbox, 'max_evals': 20}
 
     config_dictionary = {'TPOT': tpot_config, 'FEDOT': fedot_config, 'H2O': h2o_config,
                          'autokeras': autokeras_config, 'MLBox': mlbox_config}
