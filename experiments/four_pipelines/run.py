@@ -38,7 +38,7 @@ class Experiment_runner():
             self.datasets = datasets
 
         if frameworks is None:
-            self.frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Linear']
+            self.frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Mlbox']
         else:
             self.frameworks = frameworks
 
@@ -122,7 +122,7 @@ class Experiment_runner():
 
 if __name__ == '__main__':
     frameworks = ['TPOT']
-    # frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Linear']
+    # frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Mlbox']
     runner = Experiment_runner(problem_type='classification',
                                time_for_experiment=10,
                                number_of_experiments=3,

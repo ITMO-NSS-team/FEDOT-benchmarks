@@ -6,6 +6,8 @@ from mlbox.prediction import Predictor
 from mlbox.preprocessing import Reader, Drift_thresholder
 from benchmark_utils import get_models_hyperparameters
 from fedot.core.repository.tasks import Task, TaskTypesEnum
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def separate_target_column(file_path: str, target_name: str, name_of_dataset: str):
@@ -40,8 +42,8 @@ def run_mlbox(train_file_path: str,
     data = reader.train_test_split(paths, target_name)
     data = Drift_thresholder(to_path=save_path_model).fit_transform(data)
 
-    score = 'roc_auc' if task.task_type == TaskTypesEnum.classification else 'neg_mean_squared_error'
-    target_col = '1.0' if task.task_type == TaskTypesEnum.classification else 'target_predicted'
+    score = 'roc_auc' if task.name == 'classification' else 'neg_mean_squared_error'
+    target_col = '1.0' if task.name == 'classification' else 'target_predicted'
 
     opt = Optimiser(scoring=score, n_folds=5, to_path=save_path_model)
     params = opt.optimise(config_data['space'], data, max_evals=config_data['max_evals'])
