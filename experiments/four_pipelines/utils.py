@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import glob
 from fedot.api.main import Fedot
 from pmlb import classification_dataset_names, regression_dataset_names
 from benchmark_utils import save_metrics_result_file
@@ -10,25 +11,6 @@ from model.mlbox.b_mlbox import run_mlbox
 from model.tpot.b_tpot import run_tpot
 from baseline.b_xgboost import run_xgboost
 from sklearn.metrics import f1_score, mean_squared_error, roc_auc_score, balanced_accuracy_score, mean_absolute_error
-
-
-def create_report_dataframe(type_of_task, name_of_pipeline, name_of_dataset, num_of_experiments):
-    tmp_lst = []
-
-    for run_num in range(num_of_experiments):
-        path = f'./{name_of_pipeline}/{name_of_dataset}/{run_num + 1}_experiment/{name_of_dataset}_run_number_{run_num + 1}_best_metric.json'
-        df = pd.read_json(path, orient='records')
-        df['name_of_experiment'] = name_of_dataset
-        df = df.reset_index()
-        df.rename(columns={'index': 'name_of_metric'}, inplace=True)
-        tmp_lst.append(df)
-    df_all = pd.concat(tmp_lst)
-    df_all = df_all.groupby(by=['name_of_metric']).mean()
-    df_all = df_all.reset_index()
-    df_all.rename(columns={'index': 'name_of_metric'}, inplace=True)
-    df_all['name_of_experiment'] = name_of_dataset
-    df_all['type_of_pipeline'] = name_of_pipeline
-    return df_all
 
 
 def _problem_and_metric_for_dataset(name_of_dataset: str):
@@ -70,6 +52,20 @@ def calculate_metrics(metric_list: list, target: list, predicted_probs: list, pr
     return result_dict
 
 
+def create_folder(run, name_of_method, name_of_dataset, time_for_exp, calculated_metrics, model=None):
+    try:
+        tmp_folder = str(run + 1) + '_experiment'
+        experiment_path = f'./{name_of_method}/{name_of_dataset}/{tmp_folder}'
+        if not os.path.isdir(experiment_path):
+            os.makedirs(experiment_path)
+        name_of_experiment = name_of_dataset + '_run_number_' + str(run + 1)
+        save_model_history(experiment_path, name_of_experiment, time_for_exp, calculated_metrics, model)
+    except Exception as ex:
+        print(ex)
+
+    return experiment_path
+
+
 def save_model_history(experiment_path: str,
                        name_of_experiment: str,
                        time: int,
@@ -87,16 +83,22 @@ def save_model_history(experiment_path: str,
     return
 
 
-def create_folder(run, name_of_method, name_of_dataset, time_for_exp, calculated_metrics, model=None):
-    try:
-        tmp_folder = str(run + 1) + '_experiment'
-        experiment_path = f'./{name_of_method}/{name_of_dataset}/{tmp_folder}'
-        if not os.path.isdir(experiment_path):
-            os.makedirs(experiment_path)
-        name_of_experiment = name_of_dataset + '_run_number_' + str(run + 1)
-        save_model_history(experiment_path, name_of_experiment, time_for_exp, calculated_metrics, model)
-    except Exception as ex:
-        print(ex)
+def create_report_dataframe(experiment_path,name_of_dataset,name_of_pipeline):
+    tmp_lst = []
+    path = f'{experiment_path}/*.json'.format(experiment_path)
+    for f in glob.glob(path, recursive=True):
+        df = pd.read_json(f, orient='records')
+        df['name_of_experiment'] = name_of_dataset
+        df = df.reset_index()
+        df.rename(columns={'index': 'name_of_metric'}, inplace=True)
+        tmp_lst.append(df)
+    df_all = pd.concat(tmp_lst)
+    df_all = df_all.groupby(by=['name_of_metric']).mean()
+    df_all = df_all.reset_index()
+    df_all.rename(columns={'index': 'name_of_metric'}, inplace=True)
+    df_all['name_of_experiment'] = name_of_dataset
+    df_all['type_of_pipeline'] = name_of_pipeline
+    return df_all
 
 
 def Fedot_model(train_path,
