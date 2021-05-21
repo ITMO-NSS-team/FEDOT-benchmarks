@@ -117,8 +117,7 @@ class Experiment_runner():
 
 
 if __name__ == '__main__':
-    frameworks = ['TPOT', 'FEDOT', 'Baseline']
-    # frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Mlbox']
+    frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Mlbox']
     runner = Experiment_runner(problem_type='classification',
                                time_for_experiment=10,
                                number_of_experiments=3,
