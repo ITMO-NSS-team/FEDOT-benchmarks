@@ -70,9 +70,8 @@ class Experiment_runner():
                                                                                     task=self.problem_type,
                                                                                     metric_names=self.metrics,
                                                                                     time_for_exp=self.time_for_experiment)
-                        create_folder(run, framework, dataset, self.time_for_experiment, metric_list, baseline_fedot_model)
-                        results = create_report_dataframe(self.problem_type, framework, dataset,
-                                                          self.number_of_experiments)
+                        path =create_folder(run, framework, dataset, self.time_for_experiment, metric_list, baseline_fedot_model)
+                        results = create_report_dataframe(path, dataset, framework)
                     elif framework == 'TPOT':
                         true_target, predicted, predicted_labels = tpot_model(train_path=train_file,
                                                                               test_path=test_file,
@@ -81,26 +80,23 @@ class Experiment_runner():
                                                                               time_for_exp=self.time_for_experiment,
                                                                               experiment_number=run)
                         metric_list = calculate_metrics(self.metrics, true_target, predicted, predicted_labels)
-                        create_folder(run, framework, dataset, self.time_for_experiment, metric_list)
-                        results = create_report_dataframe(self.problem_type, framework, dataset,
-                                                          self.number_of_experiments)
+                        path = create_folder(run, framework, dataset, self.time_for_experiment, metric_list)
+                        results = create_report_dataframe(path, dataset, framework)
                     elif framework == 'Baseline':
                         true_target, predicted, predicted_labels = baseline_model(train_path=train_file,
                                                                                   test_path=test_file,
                                                                                   task=self.task)
                         metric_list = calculate_metrics(self.metrics, true_target, predicted, predicted_labels)
-                        create_folder(run, framework, dataset, self.time_for_experiment, metric_list)
-                        results = create_report_dataframe(self.problem_type, framework, dataset,
-                                                          self.number_of_experiments)
+                        path = create_folder(run, framework, dataset, self.time_for_experiment, metric_list)
+                        results = create_report_dataframe(path, dataset, framework)
                     else:
                         true_target, predicted = linear_pipeline_model(train_path=train_file,
                                                                        test_path=test_file,
                                                                        name_of_dataset=dataset,
                                                                        task=self.task)
                         metric_list = calculate_metrics(self.metrics, true_target, predicted.values, convert_flag=True)
-                        create_folder(run, framework, dataset, self.time_for_experiment, metric_list)
-                        results = create_report_dataframe(self.problem_type, framework, dataset,
-                                                          self.number_of_experiments)
+                        path = create_folder(run, framework, dataset, self.time_for_experiment, metric_list)
+                        results = create_report_dataframe(path, dataset, framework)
                     experiments_results.append(results)
 
         if not self.report_flag:
@@ -116,12 +112,12 @@ class Experiment_runner():
             index=['name_of_metric', 'type_of_pipeline'],
             columns='name_of_experiment',
             aggfunc=np.mean)
-        df.to_csv(f'./pivot_tables/{self.problem_type}_pivot_table.csv')
+        df.to_csv(f'./{self.problem_type}_pivot_table.csv')
         return
 
 
 if __name__ == '__main__':
-    frameworks = ['FEDOT', 'Baseline', 'TPOT']
+    frameworks = ['TPOT', 'FEDOT', 'Baseline']
     # frameworks = ['FEDOT', 'TPOT', 'Baseline', 'Mlbox']
     runner = Experiment_runner(problem_type='classification',
                                time_for_experiment=10,
