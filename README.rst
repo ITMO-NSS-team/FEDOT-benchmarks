@@ -1,4 +1,4 @@
-AutoML-benchmark
+AutoML benchmark for FEDOT framework - [OBSOLETE, see `AMLB <https://github.com/openml/automlbenchmark>`__ and `pytsbe <https://github.com/ITMO-NSS-team/pytsbe>`__ for actual examples]
 ================
 
 This tool will help you to execute different AutoMl frameworks with
